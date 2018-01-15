@@ -1,3 +1,6 @@
 #!/usr/bin/env python
+from game_state import *
 
-# drawState([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4 ])
+#TODO: make game loop for single player
+#TODO: make "AI" by randomly picking from legal moves
+
