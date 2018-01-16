@@ -16,11 +16,12 @@ def drawGap(state, row):
     return (_drawStaticPart(' ','+'), row)
 
 def drawMiddle(state, row):
-    return ('|' +
+    ret = ('|' +
             _drawCellNumber(state[PLAYER_2_CAPTURES]) +
             _drawStaticPart('-','+',7) +
             _drawCellNumber(state[PLAYER_1_CAPTURES]) +
             '|', row)
+    return ret
 
 def drawRow(state, rowOffset):
     row = state[rowOffset:rowOffset+6]
@@ -30,7 +31,7 @@ def drawRow(state, rowOffset):
             [_drawCellNumber('')]
     return ('|'+'|'.join(cells)+'|', PLAYER_1_ROW)
 
-def drawState(state):
+def getStateDrawing(state):
     scanlines = [
             drawEdge,
             drawGap, drawRow, drawGap,
@@ -43,4 +44,14 @@ def drawState(state):
     for s in scanlines:
         line, rowOffset = s(state, rowOffset)
         output += [line]
-    print("\n".join(output))
+    return "\n".join(output)
+
+def drawState(state):
+    print(getStateDrawing(state))
+
+def getCommandOptionsLine():
+    opts = ['','A','B','C','D','E','F','']
+    return ' '+' '.join([_drawCellNumber(x) for x in opts])+' '
+
+def drawCommandOptions():
+    print(getCommandOptionsLine())

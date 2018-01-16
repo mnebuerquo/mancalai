@@ -28,7 +28,7 @@ class InvalidPlayer(Exception):
 
 class InvalidIndex(Exception):
     def __init__(self,index):
-        Exception.__init__(self,"InvalidIndex: "+index)
+        Exception.__init__(self,"InvalidIndex: "+str(index))
         self.index = index
 
 def init():
@@ -49,7 +49,10 @@ def getRow(state, player):
 
 def getPlayerRowIndexes(player):
     offset = getPlayerRowOffset(player)
-    return range(offset:offset+6)
+    return range(offset,offset+6)
+
+def getMaxBowls():
+    return NUM_PLAYERS*7
 
 def getOppositeBowl(index):
     # bowl index and opposite add up to 12
@@ -62,7 +65,7 @@ def getOppositeBowl(index):
 def getBowlOwner(index):
     if index>=(NUM_PLAYERS*7):
         raise InvalidIndex(index)
-    return index/7
+    return int(index/7)
 
 def getBowlCount(state, index):
     if index>=(NUM_PLAYERS*7):
@@ -73,18 +76,21 @@ def getCurrentPlayer(state):
     return state[PLAYER_TURN]
 
 def isLegalMove(state, move):
+    print("isLegalMove", move)
     if getBowlOwner(move)!=getCurrentPlayer(state):
+        print("not owner")
         return False
     elif 0==getBowlCount(state, move):
+        print("empty")
         return False
-    else
+    else:
         return True
 
 def isGameOver(state):
     for player in [PLAYER_1, PLAYER_2]:
         row = getRow(state, player)
         if next(True for bowl in row if bowl>0):
-            return false
+            return False
     return True
 
 def isMancala(index):
@@ -125,23 +131,31 @@ def getOpponentMancalas(player):
         nxt = nextPlayer(nxt)
     return indexes
 
+def translateMove(state, n):
+    isPlayer1 = (PLAYER_1 == getCurrentPlayer(state))
+    nprime = n if isPlayer1 else PLAYER_2_CAPTURES-1-n
+    return nprime
+
 def doMove(state, move):
+    print("doMove", move)
     if not isLegalMove(state, move):
         raise InvalidMove(state,move)
+    print("doMove", move)
     newstate = state[:]
     player = getCurrentPlayer(newstate)
     stones = newstate[move]
+    newstate[move]=0
     skip = getOpponentMancalas(player)
-    freeTurn = false
-    wasEmpty = false
+    freeTurn = False
+    wasEmpty = False
     nextBowl = move
     for i in range(stones):
-        nextBowl+=1
+        nextBowl=(nextBowl+1) % getMaxBowls()
         freeTurn = False
         wasEmpty = False
         if nextBowl in skip:
             continue
-        if getBowlOwner(nextBowl)==player
+        if getBowlOwner(nextBowl)==player:
             if isMancala(nextBowl):
                 freeTurn = True
             else:
@@ -152,7 +166,7 @@ def doMove(state, move):
         opposite = getOppositeBowl(nextBowl)
         captured = newstate[opposite]
         newstate[opposite] = 0
-        newstate[nextBowl]+=captured
+        newstate[getMancalaIndex(player)]+=captured
     if not freeTurn:
         newstate[PLAYER_TURN] = nextPlayer(player)
     return scoreGame(newstate)
