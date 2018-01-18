@@ -3,41 +3,41 @@ from game_state import *
 
 CELL_WIDTH = 5
 
-def _drawStaticPart(filler,joiner,numslots=9):
+def _staticPart(filler,joiner,numslots=9):
     return (filler * CELL_WIDTH).join( [joiner] * numslots )
 
-def _drawCellNumber(num):
+def _cellNumber(num):
     return ('{:^'+str(CELL_WIDTH)+'}').format(num)
 
-def drawEdge(state, row):
-    return (_drawStaticPart('-','+'), row)
+def _boardEdge(state, row):
+    return (_staticPart('-','+'), row)
 
-def drawGap(state, row):
-    return (_drawStaticPart(' ','+'), row)
+def _boardGap(state, row):
+    return (_staticPart(' ','|'), row)
 
-def drawMiddle(state, row):
+def _boardMiddle(state, row):
     ret = ('|' +
-            _drawCellNumber(state[PLAYER_2_CAPTURES]) +
-            _drawStaticPart('-','+',7) +
-            _drawCellNumber(state[PLAYER_1_CAPTURES]) +
+            _cellNumber(state[PLAYER_2_CAPTURES]) +
+            _staticPart('-','+',7) +
+            _cellNumber(state[PLAYER_1_CAPTURES]) +
             '|', row)
     return ret
 
-def drawRow(state, rowOffset):
+def _boardRow(state, rowOffset):
     row = state[rowOffset:rowOffset+6]
     row = row if PLAYER_1_ROW==rowOffset else row[::-1]
-    cells = [_drawCellNumber('')] + \
-            [ _drawCellNumber(r) for r in row ] + \
-            [_drawCellNumber('')]
+    cells = [_cellNumber('')] + \
+            [ _cellNumber(r) for r in row ] + \
+            [_cellNumber('')]
     return ('|'+'|'.join(cells)+'|', PLAYER_1_ROW)
 
 def getStateDrawing(state):
     scanlines = [
-            drawEdge,
-            drawGap, drawRow, drawGap,
-            drawMiddle,
-            drawGap, drawRow, drawGap,
-            drawEdge
+            _boardEdge,
+            _boardGap, _boardRow, _boardGap,
+            _boardMiddle,
+            _boardGap, _boardRow, _boardGap,
+            _boardEdge
             ]
     output = []
     rowOffset = PLAYER_2_ROW
@@ -51,7 +51,7 @@ def drawState(state):
 
 def getCommandOptionsLine():
     opts = ['','A','B','C','D','E','F','']
-    return ' '+' '.join([_drawCellNumber(x) for x in opts])+' '
+    return ' '+' '.join([_cellNumber(x) for x in opts])+' '
 
 def drawCommandOptions():
     print(getCommandOptionsLine())

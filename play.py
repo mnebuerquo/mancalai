@@ -10,7 +10,7 @@ class GameConsole(cmd.Cmd):
     def setPrompt(self):
         names = ["Player 1", "Player 2"]
         promptlines = [
-                d.getStateDrawing(range(15)),
+                # d.getStateDrawing(range(15)),
                 d.getStateDrawing(self.gamestate),
                 d.getCommandOptionsLine(),
                 names[s.getCurrentPlayer(self.gamestate)]+': '
