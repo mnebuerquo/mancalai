@@ -2,6 +2,7 @@ import cmd
 import game_state as s
 import draw_game as d
 
+
 class GameConsole(cmd.Cmd):
     intro = 'Welcome to Mancala!'
     prompt = 'Player 1'
@@ -21,7 +22,7 @@ class GameConsole(cmd.Cmd):
         # c is the chosen move, else an error
         # c should be in the range A-F
         c = c.upper()
-        opts = ['A','B','C','D','E','F']
+        opts = ['A', 'B', 'C', 'D', 'E', 'F']
         try:
             move = s.translateMove(self.gamestate, opts.index(c))
             self.gamestate = s.doMove(self.gamestate, move)
@@ -36,7 +37,8 @@ class GameConsole(cmd.Cmd):
             raise e
             return
         except ValueError:
-            print("You must choose one of the six bowls for your move (letters A-F).")
+            print("You must choose one of the six bowls for your move "
+                  "(letters A-F).")
             return
         except Exception as e:
             raise e
@@ -45,9 +47,10 @@ class GameConsole(cmd.Cmd):
         pass
 
     def __init__(self):
-        super(GameConsole,self).__init__()
+        super(GameConsole, self).__init__()
         self.gamestate = s.init()
         self.setPrompt()
+
 
 if __name__ == '__main__':
     GameConsole().cmdloop()
