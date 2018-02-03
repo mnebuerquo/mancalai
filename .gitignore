@@ -103,5 +103,8 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# pytest
+.pytest_cache/
+
 #sherman's stuff
 env3/

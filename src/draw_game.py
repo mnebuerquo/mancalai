@@ -1,5 +1,5 @@
 # just drawing stuff, no actual content here
-from game_state import *
+import game_state as gs
 
 CELL_WIDTH = 5
 
@@ -22,20 +22,20 @@ def _boardGap(state, row):
 
 def _boardMiddle(state, row):
     ret = ('|' +
-           _cellNumber(state[PLAYER_2_CAPTURES]) +
+           _cellNumber(state[gs.PLAYER_2_CAPTURES]) +
            _staticPart('-', '+', 7) +
-           _cellNumber(state[PLAYER_1_CAPTURES]) +
+           _cellNumber(state[gs.PLAYER_1_CAPTURES]) +
            '|', row)
     return ret
 
 
 def _boardRow(state, rowOffset):
     row = state[rowOffset:rowOffset+6]
-    row = row if PLAYER_1_ROW == rowOffset else row[::-1]
+    row = row if gs.PLAYER_1_ROW == rowOffset else row[::-1]
     cells = [_cellNumber('')] + \
             [_cellNumber(r) for r in row] + \
             [_cellNumber('')]
-    return ('|'+'|'.join(cells)+'|', PLAYER_1_ROW)
+    return ('|'+'|'.join(cells)+'|', gs.PLAYER_1_ROW)
 
 
 def getStateDrawing(state):
@@ -47,7 +47,7 @@ def getStateDrawing(state):
             _boardEdge
             ]
     output = []
-    rowOffset = PLAYER_2_ROW
+    rowOffset = gs.PLAYER_2_ROW
     for s in scanlines:
         line, rowOffset = s(state, rowOffset)
         output += [line]
