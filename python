@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Create Python App
+# by Mnebuerquo
+# https://github.com/mnebuerquo/create-python-app 
+# Please keep the above link in place if you are using this in your project!
+
+# Run this script instead of the python on your system to run python in your
+# container.
+
+./mn_run python "$@"

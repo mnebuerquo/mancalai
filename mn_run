@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Create Python App
+# by Mnebuerquo
+# https://github.com/mnebuerquo/create-python-app 
+# Please keep the above link in place if you are using this in your project!
+
+# This script runs a command in your container. You don't need to invoke
+# this script directly, just run ./python <filename>.py or ./pip ...
+
+. ./mn_image
+
+# build the image if it does not yet exist
+# if it does already exist, run ./mn_build to replace it
+if [ "$(docker images -q $IMAGE 2> /dev/null)" == "" ]; then
+    ./mn_build
+fi
+
+# if .env is missing, then create it so we don't have an error
+if [ ! -f .env ]; then
+	touch .env
+fi
+
+docker run -it --rm --name "$CONTAINER" --env-file .env -v "$PWD":/usr/src/app "$IMAGE" "$@"
