@@ -17,12 +17,14 @@ class GameConsole(cmd.Cmd):
     def setPrompt(self):
         names = ["Player 1", "Player 2"]
         promptlines = [
-                # d.getStateDrawing(range(15)),
                 d.getStateDrawing(self.gamestate),
                 d.getCommandOptionsLine(),
                 names[s.getCurrentPlayer(self.gamestate)]+': '
                 ]
         self.prompt = "\n".join(promptlines)
+
+    def betweenMoves(self):
+        pass
 
     def default(self, c):
         # c is the chosen move, else an error
@@ -51,12 +53,16 @@ class GameConsole(cmd.Cmd):
         except Exception as e:
             raise e
             return
+        self.betweenMoves()
         self.setPrompt()
         pass
 
-    def __init__(self):
+    def choosePlayer(player):
+        pass
+
+    def __init__(self, gamestate=None):
         super(GameConsole, self).__init__()
-        self.gamestate = s.init()
+        self.gamestate = gamestate or s.init()
         self.setPrompt()
 
 
@@ -65,11 +71,12 @@ def gameOver(state):
     print("Congratulations to Player {}".format(winner+1))
 
 
-def run():
+def run(gamestate=None):
     try:
-        GameConsole().cmdloop()
-    except s.EndGame as e:
+        GameConsole(gamestate).cmdloop()
+    except EndGame as e:
         gameOver(e.gamestate)
+
 
 if __name__ == '__main__':
     run()

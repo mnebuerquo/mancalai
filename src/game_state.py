@@ -325,7 +325,7 @@ def getWinner(gamestate):
         if c > score:
             score = c
             winner = player
-    return player
+    return winner
 
 
 def nextPlayer(player):
