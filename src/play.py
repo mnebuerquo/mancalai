@@ -3,6 +3,12 @@ import game_state as s
 import draw_game as d
 
 
+class EndGame(Exception):
+    def __init__(self, gamestate):
+        Exception.__init__(self, "Game Over.")
+        self.gamestate = gamestate
+
+
 class GameConsole(cmd.Cmd):
     intro = 'Welcome to Mancala!'
     prompt = 'Player 1'
@@ -26,6 +32,8 @@ class GameConsole(cmd.Cmd):
         try:
             move = s.translateMove(self.gamestate, opts.index(c))
             self.gamestate = s.doMove(self.gamestate, move)
+            if s.isGameOver(self.gamestate):
+                raise EndGame(self.gamestate)
         except s.InvalidMove:
             print("That is not a legal move.")
             return
@@ -52,5 +60,16 @@ class GameConsole(cmd.Cmd):
         self.setPrompt()
 
 
+def gameOver(state):
+    winner = s.getWinner(s.scoreGame(state))
+    print("Congratulations to Player {}".format(winner+1))
+
+
+def run():
+    try:
+        GameConsole().cmdloop()
+    except s.EndGame as e:
+        gameOver(e.gamestate)
+
 if __name__ == '__main__':
-    GameConsole().cmdloop()
+    run()

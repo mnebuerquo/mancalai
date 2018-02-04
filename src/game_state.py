@@ -311,6 +311,23 @@ def scoreGame(state):
     return newstate
 
 
+def getWinner(gamestate):
+    """
+    Returns the index of the winner of the game.
+
+    >>> getWinner([0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 57, 1])
+    1
+    """
+    winner = -1
+    score = 0
+    for player in range(NUM_PLAYERS):
+        c = getBowlCount(gamestate, getMancalaIndex(player))
+        if c > score:
+            score = c
+            winner = player
+    return player
+
+
 def nextPlayer(player):
     """
     Return the next player after the given player.
