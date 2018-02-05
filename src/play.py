@@ -1,12 +1,12 @@
 import cmd
 import game_state as s
 import draw_game as d
-import ai
+import importlib
 
 
 class NoAI(Exception):
     def __init__(self, ptype):
-        Exception.__init__(self, "AI type not found: "+ptype)
+        Exception.__init__(self, "AI type not found: " + str(ptype))
 
 
 class EndGame(Exception):
@@ -15,31 +15,59 @@ class EndGame(Exception):
         self.gamestate = gamestate
 
 
+class Game():
+
+    def setPlayerType(self, player, choice):
+        if choice == 'l':
+            self.player_algorithm[player] = importlib.import_module('ai.luck')
+        else:
+            self.player_algorithm[player] = None
+
+    def choosePlayer(self, player):
+        print("Who is player {}?".format(player+1))
+        playertype = ''
+        while playertype not in ['h', 'l']:
+            playertype = input("(H)uman or (L)uck: ").lower()
+            self.setPlayerType(player, playertype)
+
+    def betweenMoves(self):
+        isHumanNext = False
+        while not isHumanNext:
+            current = s.getCurrentPlayer(self.gamestate)
+            module = self.player_algorithm.get(current)
+            if module is None:
+                isHumanNext = True
+                return
+            try:
+                isHumanNext = False
+                print("My move!")
+                print(dir(module))
+                move = module.move(self.gamestate)
+                self.gamestate = s.doMove(self.gamestate, move)
+                print(module.taunt())
+            except Exception:
+                raise NoAI(current)
+        pass
+
+    def __init__(self, gamestate):
+        self.player_algorithm = {}
+        for player in range(s.NUM_PLAYERS):
+            self.choosePlayer(player)
+        self.gamestate = gamestate or s.init()
+
+
 class GameConsole(cmd.Cmd):
     intro = 'Welcome to Mancala!'
     prompt = 'Player 1'
-    gamestate = []
 
     def setPrompt(self):
         names = ["Player 1", "Player 2"]
         promptlines = [
-                d.getStateDrawing(self.gamestate),
+                d.getStateDrawing(self.game.gamestate),
                 d.getCommandOptionsLine(),
-                names[s.getCurrentPlayer(self.gamestate)]+': '
+                names[s.getCurrentPlayer(self.game.gamestate)]+': '
                 ]
         self.prompt = "\n".join(promptlines)
-
-    def betweenMoves(self):
-        current = s.getCurrentPlayer(self.gamestate)
-        ptype = self.playertype[current]
-        if 'h' == ptype:
-            return
-        elif 'r' == ptype:
-            move = ai.luck.move(self.gamestate)
-            self.gamestate = s.doMove(self.gamestate, move)
-        else:
-            raise NoAI(ptype)
-        pass
 
     def default(self, c):
         # c is the chosen move, else an error
@@ -47,10 +75,10 @@ class GameConsole(cmd.Cmd):
         c = c.upper()
         opts = ['A', 'B', 'C', 'D', 'E', 'F']
         try:
-            move = s.translateMove(self.gamestate, opts.index(c))
-            self.gamestate = s.doMove(self.gamestate, move)
-            if s.isGameOver(self.gamestate):
-                raise EndGame(self.gamestate)
+            move = s.translateMove(self.game.gamestate, opts.index(c))
+            self.game.gamestate = s.doMove(self.game.gamestate, move)
+            if s.isGameOver(self.game.gamestate):
+                raise EndGame(self.game.gamestate)
         except s.InvalidMove:
             print("That is not a legal move.")
             return
@@ -68,28 +96,19 @@ class GameConsole(cmd.Cmd):
         except Exception as e:
             raise e
             return
-        self.betweenMoves()
+        self.game.betweenMoves()
         self.setPrompt()
-
-    def choosePlayer(self, player):
-        print("Who is player {}?".format(player+1))
-        playertype = ''
-        while playertype not in ['h', 'r']:
-            playertype = input("(H)uman or (R)andom: ").lower()
-        self.playertype[player] = playertype
 
     def __init__(self, gamestate=None):
         super(GameConsole, self).__init__()
-        self.playertype = (['h']*2)[:]
-        for player in range(s.NUM_PLAYERS):
-            self.choosePlayer(player)
-        self.gamestate = gamestate or s.init()
+        self.game = Game(gamestate)
         self.setPrompt()
 
 
 def gameOver(state):
     winner = s.getWinner(s.scoreGame(state))
     print("Congratulations to Player {}".format(winner+1))
+    print(d.getStateDrawing(self.game.gamestate))
 
 
 def run(gamestate=None):

@@ -17,7 +17,7 @@ PLAYER_2 = 1
 
 class NoMoves(Exception):
     def __init__(self):
-        Exception.__init__(self,"No legal moves!")
+        Exception.__init__(self, "No legal moves!")
 
 
 class InvalidMove(Exception):
@@ -194,10 +194,19 @@ def getCurrentPlayer(state):
 
 
 def getLegalMoves(state):
+    """
+    Get list of indexes for legal moves for current player.
+
+    >>> getLegalMoves([1, 2, 3, 4, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 1])
+    [7, 8, 9, 10, 11, 12]
+
+    >>> getLegalMoves([1, 2, 3, 4, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 0])
+    [0, 1, 2, 3, 4, 5]
+    """
     player = getCurrentPlayer(state)
-    row = getRow(state, player)
     moves = []
-    for index in len(row):
+    offset = getPlayerRowOffset(player)
+    for index in range(offset, offset+6):
         if getBowlCount(state, index) > 0:
             moves.append(index)
     return moves
