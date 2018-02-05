@@ -396,6 +396,10 @@ def translateMove(state, n):
 
 
 def doMove(state, move):
+    """
+    This applies a move and returns the new game state.
+
+    """
     newstate, move = validateMove(state, move)
     player = getCurrentPlayer(newstate)
     stones = newstate[move]

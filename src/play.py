@@ -33,6 +33,8 @@ class Game():
     def betweenMoves(self):
         isHumanNext = False
         while not isHumanNext:
+            if s.isGameOver(self.gamestate):
+                raise EndGame(self.gamestate)
             current = s.getCurrentPlayer(self.gamestate)
             module = self.player_algorithm.get(current)
             if module is None:
@@ -41,10 +43,12 @@ class Game():
             try:
                 isHumanNext = False
                 print("My move!")
-                print(dir(module))
                 move = module.move(self.gamestate)
                 self.gamestate = s.doMove(self.gamestate, move)
                 print(module.taunt())
+            except s.NoMoves as n:
+                print("Oops! I have no moves!")
+                raise EndGame(self.gamestate)
             except Exception:
                 raise NoAI(current)
         pass
@@ -108,7 +112,7 @@ class GameConsole(cmd.Cmd):
 def gameOver(state):
     winner = s.getWinner(s.scoreGame(state))
     print("Congratulations to Player {}".format(winner+1))
-    print(d.getStateDrawing(self.game.gamestate))
+    print(d.getStateDrawing(state))
 
 
 def run(gamestate=None):
