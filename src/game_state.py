@@ -15,6 +15,11 @@ PLAYER_1 = 0
 PLAYER_2 = 1
 
 
+class NoMoves(Exception):
+    def __init__(self):
+        Exception.__init__(self, "No legal moves!")
+
+
 class InvalidMove(Exception):
     def __init___(self, state, move):
         Exception.__init__(self, "InvalidMove: " + move +
@@ -188,6 +193,25 @@ def getCurrentPlayer(state):
     return validatePlayer(state[PLAYER_TURN])
 
 
+def getLegalMoves(state):
+    """
+    Get list of indexes for legal moves for current player.
+
+    >>> getLegalMoves([1, 2, 3, 4, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 1])
+    [7, 8, 9, 10, 11, 12]
+
+    >>> getLegalMoves([1, 2, 3, 4, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 0])
+    [0, 1, 2, 3, 4, 5]
+    """
+    player = getCurrentPlayer(state)
+    moves = []
+    offset = getPlayerRowOffset(player)
+    for index in range(offset, offset+6):
+        if getBowlCount(state, index) > 0:
+            moves.append(index)
+    return moves
+
+
 def isLegalMove(state, move):
     """
     Determine if move is legal for given game state.
@@ -309,6 +333,23 @@ def scoreGame(state):
         score = sum(row, score)
         newstate[mindex] = score
     return newstate
+
+
+def getWinner(gamestate):
+    """
+    Returns the index of the winner of the game.
+
+    >>> getWinner([0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 57, 1])
+    1
+    """
+    winner = -1
+    score = 0
+    for player in range(NUM_PLAYERS):
+        c = getBowlCount(gamestate, getMancalaIndex(player))
+        if c > score:
+            score = c
+            winner = player
+    return winner
 
 
 def nextPlayer(player):
