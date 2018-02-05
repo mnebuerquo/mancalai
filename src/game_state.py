@@ -15,6 +15,11 @@ PLAYER_1 = 0
 PLAYER_2 = 1
 
 
+class NoMoves(Exception):
+    def __init__(self):
+        Exception.__init__(self,"No legal moves!")
+
+
 class InvalidMove(Exception):
     def __init___(self, state, move):
         Exception.__init__(self, "InvalidMove: " + move +
@@ -186,6 +191,16 @@ def getCurrentPlayer(state):
     game_state.InvalidPlayer: InvalidPlayer: 2
     """
     return validatePlayer(state[PLAYER_TURN])
+
+
+def getLegalMoves(state):
+    player = getCurrentPlayer(state)
+    row = getRow(state, player)
+    moves = []
+    for index in len(row):
+        if getBowlCount(state, index) > 0:
+            moves.append(index)
+    return moves
 
 
 def isLegalMove(state, move):

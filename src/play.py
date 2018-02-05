@@ -1,6 +1,12 @@
 import cmd
 import game_state as s
 import draw_game as d
+import ai
+
+
+class NoAI(Exception):
+    def __init__(self, ptype):
+        Exception.__init__(self, "AI type not found: "+ptype)
 
 
 class EndGame(Exception):
@@ -24,6 +30,15 @@ class GameConsole(cmd.Cmd):
         self.prompt = "\n".join(promptlines)
 
     def betweenMoves(self):
+        current = s.getCurrentPlayer(self.gamestate)
+        ptype = self.playertype[current]
+        if 'h' == ptype:
+            return
+        elif 'r' == ptype:
+            move = ai.luck.move(self.gamestate)
+            self.gamestate = s.doMove(self.gamestate, move)
+        else:
+            raise NoAI(ptype)
         pass
 
     def default(self, c):
@@ -55,13 +70,19 @@ class GameConsole(cmd.Cmd):
             return
         self.betweenMoves()
         self.setPrompt()
-        pass
 
-    def choosePlayer(player):
-        pass
+    def choosePlayer(self, player):
+        print("Who is player {}?".format(player+1))
+        playertype = ''
+        while playertype not in ['h', 'r']:
+            playertype = input("(H)uman or (R)andom: ").lower()
+        self.playertype[player] = playertype
 
     def __init__(self, gamestate=None):
         super(GameConsole, self).__init__()
+        self.playertype = (['h']*2)[:]
+        for player in range(s.NUM_PLAYERS):
+            self.choosePlayer(player)
         self.gamestate = gamestate or s.init()
         self.setPrompt()
 
