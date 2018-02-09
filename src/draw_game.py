@@ -31,6 +31,7 @@ def _boardMiddle(state, row):
 
 def _boardRow(state, rowOffset):
     row = state[rowOffset:rowOffset+6]
+    # reverses player 2
     row = row if gs.PLAYER_1_ROW == rowOffset else row[::-1]
     cells = [_cellNumber('')] + \
             [_cellNumber(r) for r in row] + \

@@ -438,4 +438,21 @@ def doMove(state, move):
         newstate[PLAYER_TURN] = nextPlayer(player)
     return scoreGame(newstate)
 
-# TODO: for opponent, reverse board? Maybe useful for training network?
+
+def flipBoard(state):
+    """
+    Flips the board to make the current player think they are player one.
+    This can be used for training AI players so they learn board states
+    from the same perspective.
+
+    >>> flipBoard([1, 2, 4, 4, 5, 6, 0, 7, 8, 9, 10, 11, 12, 0, 0])
+    [7, 8, 9, 10, 11, 12, 0, 1, 2, 4, 4, 5, 6, 0, 1]
+    """
+    newstate = state[:]
+    boardsize = NUM_PLAYERS * 7
+    for i in range(boardsize):
+        index = (i + 7) % boardsize
+        newstate[index] = state[i]
+    newstate[boardsize] = state[boardsize]
+    newstate[PLAYER_TURN] = (newstate[PLAYER_TURN] + 1) % NUM_PLAYERS
+    return newstate
