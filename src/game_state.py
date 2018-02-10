@@ -16,8 +16,9 @@ PLAYER_2 = 1
 
 
 class NoMoves(Exception):
-    def __init__(self):
-        Exception.__init__(self, "No legal moves!")
+    def __init__(self, state=[]):
+        Exception.__init__(self, 'No legal moves! [' + ','.join(state) + ']')
+        self.state = state
 
 
 class InvalidMove(Exception):
@@ -38,6 +39,11 @@ class InvalidIndex(Exception):
     def __init__(self, index):
         Exception.__init__(self, "InvalidIndex: "+str(index))
         self.index = index
+
+
+class GameNotOver(Exception):
+    def __init__(self):
+        Exception.__init__(self, "Game not over!")
 
 
 def init():
@@ -265,16 +271,23 @@ def isGameOver(state):
 
     >>> isGameOver([0, 0, 0, 0, 0, 0, 9, 12, 11, 10, 9, 8, 7, 0, 1])
     True
+
+    >>> isGameOver([12, 11, 10, 9, 8, 7, 0, 0, 0, 0, 0, 0, 0, 9, 1])
+    True
     """
     for player in range(NUM_PLAYERS):
         row = getRow(state, player)
-        # false if any bowl for this player has nonzero count in it
+        # true if any bowl for this player has nonzero count in it.
+        # both players have to have stones to move for the game to continue.
         try:
             if next(True for bowl in row if bowl > 0):
-                return False
+                # this player has a stone to move, check next player
+                continue
         except StopIteration:
+            # this player has no stones to move, game over
             return True
-    return True
+    # both players have at least one stone, still playing
+    return False
 
 
 def isMancala(index):
@@ -319,8 +332,10 @@ def scoreGame(state):
 
     >>> scoreGame([0, 0, 0, 0, 0, 0, 9, 12, 11, 10, 9, 8, 7, 0, 1])
     [0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 57, 1]
+
     >>> scoreGame([0, 0, 1, 0, 0, 0, 9, 12, 11, 10, 9, 8, 7, 0, 1])
     [0, 0, 1, 0, 0, 0, 9, 12, 11, 10, 9, 8, 7, 0, 1]
+
     """
     if not isGameOver(state):
         return state
@@ -342,6 +357,8 @@ def getWinner(gamestate):
     >>> getWinner([0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 57, 1])
     1
     """
+    if not isGameOver(gamestate):
+        raise GameNotOver()
     winner = -1
     score = 0
     for player in range(NUM_PLAYERS):

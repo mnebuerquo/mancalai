@@ -16,8 +16,16 @@ def taunt():
     return random.choice(taunts)
 
 
+def youWin():
+    pass
+
+
+def youLose():
+    pass
+
+
 def move(state):
     moves = s.getLegalMoves(state)
     if not moves:
-        raise s.NoMoves
+        raise s.NoMoves(state)
     return random.choice(moves)
