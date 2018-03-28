@@ -9,7 +9,7 @@ def _staticPart(filler, joiner, numslots=9):
 
 
 def _cellNumber(num):
-    return ('{:^'+str(CELL_WIDTH)+'}').format(num)
+    return ('{:^' + str(CELL_WIDTH) + '}').format(num)
 
 
 def _boardEdge(state, row):
@@ -30,23 +30,23 @@ def _boardMiddle(state, row):
 
 
 def _boardRow(state, rowOffset):
-    row = state[rowOffset:rowOffset+6]
+    row = state[rowOffset:rowOffset + 6]
     # reverses player 2
     row = row if gs.PLAYER_1_ROW == rowOffset else row[::-1]
     cells = [_cellNumber('')] + \
             [_cellNumber(r) for r in row] + \
             [_cellNumber('')]
-    return ('|'+'|'.join(cells)+'|', gs.PLAYER_1_ROW)
+    return ('|' + '|'.join(cells) + '|', gs.PLAYER_1_ROW)
 
 
 def getStateDrawing(state):
     scanlines = [
-            _boardEdge,
-            _boardGap, _boardRow, _boardGap,
-            _boardMiddle,
-            _boardGap, _boardRow, _boardGap,
-            _boardEdge
-            ]
+        _boardEdge,
+        _boardGap, _boardRow, _boardGap,
+        _boardMiddle,
+        _boardGap, _boardRow, _boardGap,
+        _boardEdge
+    ]
     output = []
     rowOffset = gs.PLAYER_2_ROW
     for s in scanlines:
@@ -61,7 +61,7 @@ def drawState(state):
 
 def getCommandOptionsLine():
     opts = ['', 'A', 'B', 'C', 'D', 'E', 'F', '']
-    return ' '+' '.join([_cellNumber(x) for x in opts])+' '
+    return ' ' + ' '.join([_cellNumber(x) for x in opts]) + ' '
 
 
 def drawCommandOptions():

@@ -24,7 +24,7 @@ class Game():
             self.player_algorithm[player] = None
 
     def choosePlayer(self, player):
-        print("Who is player {}?".format(player+1))
+        print("Who is player {}?".format(player + 1))
         playertype = ''
         while playertype not in ['h', 'l']:
             playertype = input("(H)uman or (L)uck: ").lower()
@@ -67,10 +67,10 @@ class GameConsole(cmd.Cmd):
     def setPrompt(self):
         names = ["Player 1", "Player 2"]
         promptlines = [
-                d.getStateDrawing(self.game.gamestate),
-                d.getCommandOptionsLine(),
-                names[s.getCurrentPlayer(self.game.gamestate)]+': '
-                ]
+            d.getStateDrawing(self.game.gamestate),
+            d.getCommandOptionsLine(),
+            names[s.getCurrentPlayer(self.game.gamestate)] + ': '
+        ]
         self.prompt = "\n".join(promptlines)
 
     def default(self, c):
@@ -111,7 +111,7 @@ class GameConsole(cmd.Cmd):
 
 def gameOver(state):
     winner = s.getWinner(s.scoreGame(state))
-    print("Congratulations to Player {}".format(winner+1))
+    print("Congratulations to Player {}".format(winner + 1))
     print(d.getStateDrawing(state))
 
 

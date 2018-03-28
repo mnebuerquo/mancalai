@@ -31,13 +31,13 @@ class InvalidMove(Exception):
 
 class InvalidPlayer(Exception):
     def __init__(self, player):
-        Exception.__init__(self, "InvalidPlayer: "+str(player))
+        Exception.__init__(self, "InvalidPlayer: " + str(player))
         self.player = player
 
 
 class InvalidIndex(Exception):
     def __init__(self, index):
-        Exception.__init__(self, "InvalidIndex: "+str(index))
+        Exception.__init__(self, "InvalidIndex: " + str(index))
         self.index = index
 
 
@@ -73,7 +73,7 @@ def validateIndex(index):
         ...
     game_state.InvalidIndex: InvalidIndex: 14
     """
-    if index >= 0 and index < NUM_PLAYERS*7:
+    if index >= 0 and index < NUM_PLAYERS * 7:
         return index
     else:
         raise InvalidIndex(index)
@@ -110,7 +110,7 @@ def getPlayerRowOffset(player):
     """
     if player < 0 or player >= NUM_PLAYERS:
         raise InvalidPlayer(player)
-    offset = player*7
+    offset = player * 7
     return offset
 
 
@@ -124,7 +124,7 @@ def getRow(state, player):
     [1, 2, 3, 4, 5, 6]
     """
     offset = getPlayerRowOffset(player)
-    return state[offset:offset+6]
+    return state[offset:offset + 6]
 
 
 def getMaxBowls():
@@ -133,7 +133,7 @@ def getMaxBowls():
     >>> getMaxBowls()
     14
     """
-    return NUM_PLAYERS*7
+    return NUM_PLAYERS * 7
 
 
 def getOppositeBowl(index):
@@ -152,7 +152,7 @@ def getOppositeBowl(index):
     """
     # bowl index and opposite add up to 12
     validateIndex(index)
-    opposite = (PLAYER_2_CAPTURES-1-index)
+    opposite = (PLAYER_2_CAPTURES - 1 - index)
     return opposite
 
 
@@ -168,7 +168,7 @@ def getBowlOwner(index):
         ...
     game_state.InvalidIndex: InvalidIndex: 14
     """
-    return int(validateIndex(index)/7)
+    return int(validateIndex(index) / 7)
 
 
 def getBowlCount(state, index):
@@ -212,7 +212,7 @@ def getLegalMoves(state):
     player = getCurrentPlayer(state)
     moves = []
     offset = getPlayerRowOffset(player)
-    for index in range(offset, offset+6):
+    for index in range(offset, offset + 6):
         if getBowlCount(state, index) > 0:
             moves.append(index)
     return moves
@@ -378,7 +378,7 @@ def nextPlayer(player):
     >>> nextPlayer(0)
     1
     """
-    return ((validatePlayer(player)+1) % NUM_PLAYERS)
+    return ((validatePlayer(player) + 1) % NUM_PLAYERS)
 
 
 def getOpponentMancalas(player):
@@ -408,7 +408,7 @@ def translateMove(state, n):
     8
     """
     isPlayer1 = (PLAYER_1 == getCurrentPlayer(state))
-    nprime = n if isPlayer1 else PLAYER_2_CAPTURES-1-n
+    nprime = n if isPlayer1 else PLAYER_2_CAPTURES - 1 - n
     return nprime
 
 
@@ -473,3 +473,17 @@ def flipBoard(state):
     newstate[boardsize] = state[boardsize]
     newstate[PLAYER_TURN] = (newstate[PLAYER_TURN] + 1) % NUM_PLAYERS
     return newstate
+
+
+def flipMove(move, player):
+    """
+    Converts move as if it was always made by player 1.
+
+    >>> flipMove(9, 1)
+    2
+
+    >>> flipMove(1, 0)
+    1
+    """
+    boardsize = NUM_PLAYERS * 7
+    return ((move + (player * 7)) % boardsize)
