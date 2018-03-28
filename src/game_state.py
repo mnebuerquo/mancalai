@@ -458,12 +458,13 @@ def doMove(state, move):
 
 def flipBoard(state):
     """
-    Flips the board to make the current player think they are player one.
-    This can be used for training AI players so they learn board states
-    from the same perspective.
+    Flips the board one player to the right.
 
     >>> flipBoard([1, 2, 4, 4, 5, 6, 0, 7, 8, 9, 10, 11, 12, 0, 0])
     [7, 8, 9, 10, 11, 12, 0, 1, 2, 4, 4, 5, 6, 0, 1]
+
+    >>> flipBoard([1, 2, 4, 4, 5, 6, 0, 7, 8, 9, 10, 11, 12, 0, 1])
+    [7, 8, 9, 10, 11, 12, 0, 1, 2, 4, 4, 5, 6, 0, 0]
     """
     newstate = state[:]
     boardsize = NUM_PLAYERS * 7
@@ -473,6 +474,23 @@ def flipBoard(state):
     newstate[boardsize] = state[boardsize]
     newstate[PLAYER_TURN] = (newstate[PLAYER_TURN] + 1) % NUM_PLAYERS
     return newstate
+
+
+def flipBoardCurrentPlayer(state):
+    """
+    Flips the board to make the current player think they are player one.
+    This can be used for training AI players so they learn board states
+    from the same perspective.
+
+    >>> state = [1, 2, 4, 4, 5, 6, 0, 7, 8, 9, 10, 11, 12, 0, 1]
+    >>> flipBoardCurrentPlayer(state)
+    [7, 8, 9, 10, 11, 12, 0, 1, 2, 4, 4, 5, 6, 0, 0]
+
+    >>> state = [1, 2, 4, 4, 5, 6, 0, 7, 8, 9, 10, 11, 12, 0, 0]
+    >>> flipBoardCurrentPlayer(state)
+    [1, 2, 4, 4, 5, 6, 0, 7, 8, 9, 10, 11, 12, 0, 0]
+    """
+    return state if getCurrentPlayer(state) == PLAYER_1 else flipBoard(state)
 
 
 def flipMove(move, player):
