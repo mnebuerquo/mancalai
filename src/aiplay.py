@@ -36,12 +36,13 @@ def logMove(row):
 def play_game(algorithm1, algorithm2):
     game = s.init()
     players = (algorithm1, algorithm2)
+    ais = (algorithm1.AI(), algorithm2.AI())
     done = False
     moves = []
     while not done:
         # do move for someone
         player = s.getCurrentPlayer(game)
-        move = players[player].move(game)
+        move = ais[player].move(game)
         mt = {
             "move": s.flipMove(move, player),
             "board": s.flipBoardCurrentPlayer(game),
@@ -52,16 +53,17 @@ def play_game(algorithm1, algorithm2):
         game = s.doMove(game, move)
         done = s.isGameOver(game)
     winner = s.getWinner(game)
+    # make training set with move, gamestate, and 1 for win, 0 for lose
+    trainingset = [dict(d, winner=int(winner == d['player'])) for d in moves]
+    for p in ais:
+        p.train(trainingset)
     i = 0
-    for p in players:
+    for p in ais:
         if i == winner:
             p.youWin()
         else:
             p.youLose()
         i += 1
-    # make training set with move, gamestate, and 1 for win, 0 for lose
-    # trainingset = [(m, g, int(winner == p), p, a) for m, g, p, a in moves]
-    trainingset = [dict(d, winner=int(winner == d['player'])) for d in moves]
     return (winner, trainingset)
 
 
