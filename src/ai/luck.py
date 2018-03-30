@@ -4,6 +4,7 @@ import random
 
 
 class AI(AiBase):
+
     taunts = [
             'How do you like those apples?',
             'I\'m the bomb!',
@@ -12,9 +13,8 @@ class AI(AiBase):
             'Hello. My name is Inigo Montoya. You killed my father. ' +
             'Prepare to die.',
             'Bonzai!',
-            'You\'re welcome.'
+            'You\'re welcome.',
         ]
-
 
     def move(self, state):
         moves = s.getLegalMoves(state)

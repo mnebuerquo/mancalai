@@ -55,8 +55,6 @@ def play_game(algorithm1, algorithm2):
     winner = s.getWinner(game)
     # make training set with move, gamestate, and 1 for win, 0 for lose
     trainingset = [dict(d, winner=int(winner == d['player'])) for d in moves]
-    for p in ais:
-        p.train(trainingset)
     i = 0
     for p in ais:
         if i == winner:

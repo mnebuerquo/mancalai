@@ -3,7 +3,6 @@ import game_state as s
 import random
 import tensorflow as tf
 import json
-import pandas as pd
 
 INPUT_SIZE = (s.NUM_PLAYERS * 7)
 OUTPUT_SIZE = 6
@@ -11,23 +10,55 @@ HIDDEN_LAYER_SIZE = 128
 LEARNING_RATE = 0.05
 BATCH_SIZE = 50
 SAVE_PATH = "./data/model.ckpt"
+BETTER_MOVE = 0.5
+WINNING_MOVE = 1
+LOSING_MOVE = 0
+
 
 def variable(shape, name):
     initial = tf.truncated_normal(shape, stddev=0.1)
     return tf.Variable(initial, name=name)
 
 
-def moveToVector(m):
+def losingVector(m):
     """
-    >>> moveToVector(0)
-    [1, 0, 0, 0, 0, 0]
-    >>> moveToVector(2)
-    [0, 0, 1, 0, 0, 0]
-    >>> moveToVector(5)
-    [0, 0, 0, 0, 0, 1]
+    Return vector of moves with losing move score set low, and others higher.
+    >>> losingVector(3) == [BETTER_MOVE, BETTER_MOVE, BETTER_MOVE, \
+                            LOSING_MOVE, BETTER_MOVE, BETTER_MOVE]
+    True
+    >>> losingVector(1) == [BETTER_MOVE, LOSING_MOVE, BETTER_MOVE, \
+                            BETTER_MOVE, BETTER_MOVE, BETTER_MOVE]
+    True
     """
-    z = [0]*6
-    return z[:m]+[1]+z[m+1:]
+    z = [BETTER_MOVE]*6
+    return z[:m]+[LOSING_MOVE]+z[m+1:]
+
+
+def winningVector(m):
+    """
+    Return vector of moves with winning move score set high, and others low.
+    >>> winningVector(3) == [LOSING_MOVE, LOSING_MOVE, LOSING_MOVE, \
+                            WINNING_MOVE, LOSING_MOVE, LOSING_MOVE]
+    True
+    >>> winningVector(1) == [LOSING_MOVE, WINNING_MOVE, LOSING_MOVE, \
+                            LOSING_MOVE, LOSING_MOVE, LOSING_MOVE]
+    True
+    """
+    z = [LOSING_MOVE]*6
+    return z[:m]+[WINNING_MOVE]+z[m+1:]
+
+
+def moveToVector(m, iswinner):
+    """
+    >>> moveToVector(0, 1) == [WINNING_MOVE, LOSING_MOVE, LOSING_MOVE, \
+                            LOSING_MOVE, LOSING_MOVE, LOSING_MOVE]
+    True
+    >>> moveToVector(2, 0) == [BETTER_MOVE, BETTER_MOVE, LOSING_MOVE, \
+                            BETTER_MOVE, BETTER_MOVE, BETTER_MOVE]
+    True
+    """
+    return winningVector(m) if iswinner else losingVector(m)
+
 
 class Network():
 
@@ -69,13 +100,21 @@ class Network():
 
         self.sess = tf.InteractiveSession()
         try:
-            saver.restore(self.sess, SAVE_PATH)
+            if tf.train.checkpoint_exists(tf.train.latest_checkpoint(SAVE_PATH)):
+                self.saver.restore(self.sess, SAVE_PATH)
+                loaded = True
         except Exception:
+            loaded = False
+        if not loaded:
             self.sess.run(tf.global_variables_initializer())
 
     def getMove(self, state):
-        y = self.sess.run(self.y, {self.x:[state[:14]]})
-        options = list(y[0])
+        moves = s.getLegalMoves(state)
+        y = self.sess.run(self.y, {self.x: [state[:14]]})
+        scores = list(y[0])
+        options = ([0]*6)[:]
+        for m in moves:
+            options[m] = max(0.001, scores[m])
         max_value = max(options)
         move = options.index(max_value)
         return move
@@ -83,11 +122,10 @@ class Network():
     def train_batch(self, batch):
         train_step = tf.train.GradientDescentOptimizer(
             LEARNING_RATE).minimize(self.cross_entropy)
-        dfx = [s[:14] for s, m, w in batch if w==1]
-        dfy_ = [moveToVector(m) for s, m, w in batch if w==1]
-        train_step.run(feed_dict = {self.x: dfx, self.y_: dfy_})
+        dfx = [s[:14] for s, m, w in batch]
+        dfy_ = [moveToVector(m, w) for s, m, w in batch]
+        train_step.run(feed_dict={self.x: dfx, self.y_: dfy_})
         self.saver.save(self.sess, SAVE_PATH)
-
 
     def train(self, data=None, datafile=None):
         if datafile is not None:
@@ -98,12 +136,10 @@ class Network():
             self.train_batch(data)
 
 
-
 class AI(AiBase):
     def __init__(self):
         super().__init__()
         self.nn = Network()
-
 
     def taunt(self):
         taunts = [
@@ -115,31 +151,18 @@ class AI(AiBase):
                 ]
         return random.choice(taunts)
 
-
-    def youWin(self):
-        pass
-
-
-    def youLose(self):
-        pass
-
-
     def train(self, data=None, datafile=None):
         self.nn.train(data=data, datafile=datafile)
 
-
     def move(self, state):
-        if s.getCurrentPlayer(state) != 0:
+        player = s.getCurrentPlayer(state)
+        if player != 0:
             flip = True
             board = s.flipBoard(state)
         else:
             flip = False
             board = state
-        move = self.nn.getMove(state)
+        move = self.nn.getMove(board)
         if flip:
-            move = s.flipMove(move)
+            move = s.flipMove(move, player)
         return move
-        # moves = s.getLegalMoves(state)
-        # if not moves:
-            # raise s.NoMoves(state)
-        # return random.choice(moves)
