@@ -100,7 +100,8 @@ class Network():
 
         self.sess = tf.InteractiveSession()
         try:
-            if tf.train.checkpoint_exists(tf.train.latest_checkpoint(SAVE_PATH)):
+            if tf.train.checkpoint_exists(
+                    tf.train.latest_checkpoint(SAVE_PATH)):
                 self.saver.restore(self.sess, SAVE_PATH)
                 loaded = True
         except Exception:

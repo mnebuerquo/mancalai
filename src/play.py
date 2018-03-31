@@ -20,26 +20,28 @@ class Game():
     def setPlayerType(self, player, choice):
         if choice == 'l':
             self.player_algorithm[player] = importlib.import_module('ai.luck')
+        elif choice == 'n':
+            self.player_algorithm[player] = importlib.import_module('ai.nn')
         else:
             self.player_algorithm[player] = None
 
     def choosePlayer(self, player):
         print("Who is player {}?".format(player + 1))
         playertype = ''
-        while playertype not in ['h', 'l']:
-            playertype = input("(H)uman or (L)uck: ").lower()
+        while playertype not in ['h', 'l', 'n']:
+            playertype = input("(H)uman or (L)uck or (N)eural network?: ").lower()
             self.setPlayerType(player, playertype)
 
     def betweenMoves(self):
-        isHumanNext = False
+        current = s.getCurrentPlayer(self.gamestate)
+        module = self.player_algorithm.get(current)
+        isHumanNext = False if module is None else True
         while not isHumanNext:
             if s.isGameOver(self.gamestate):
                 raise EndGame(self.gamestate)
             current = s.getCurrentPlayer(self.gamestate)
             module = self.player_algorithm.get(current)
-            if module is None:
-                isHumanNext = True
-                return
+            isHumanNext = False if module is None else True
             try:
                 isHumanNext = False
                 print("My move!")
@@ -55,14 +57,15 @@ class Game():
 
     def __init__(self, gamestate):
         self.player_algorithm = {}
-        for player in range(s.NUM_PLAYERS):
+        print("Player 1 is human.")
+        for player in range(1,s.NUM_PLAYERS):
             self.choosePlayer(player)
         self.gamestate = gamestate or s.init()
+        self.betweenMoves()
 
 
 class GameConsole(cmd.Cmd):
     intro = 'Welcome to Mancala!'
-    prompt = 'Player 1'
 
     def setPrompt(self):
         names = ["Player 1", "Player 2"]
@@ -106,6 +109,7 @@ class GameConsole(cmd.Cmd):
     def __init__(self, gamestate=None):
         super(GameConsole, self).__init__()
         self.game = Game(gamestate)
+        self.game.betweenMoves()
         self.setPrompt()
 
 
