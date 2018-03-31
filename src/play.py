@@ -29,7 +29,8 @@ class Game():
         print("Who is player {}?".format(player + 1))
         playertype = ''
         while playertype not in ['h', 'l', 'n']:
-            playertype = input("(H)uman or (L)uck or (N)eural network?: ").lower()
+            prompt = "(H)uman or (L)uck or (N)eural network?: "
+            playertype = input(prompt).lower()
             self.setPlayerType(player, playertype)
 
     def betweenMoves(self):
@@ -58,7 +59,7 @@ class Game():
     def __init__(self, gamestate):
         self.player_algorithm = {}
         print("Player 1 is human.")
-        for player in range(1,s.NUM_PLAYERS):
+        for player in range(1, s.NUM_PLAYERS):
             self.choosePlayer(player)
         self.gamestate = gamestate or s.init()
         self.betweenMoves()
