@@ -30,8 +30,8 @@ def losingVector(m):
                             BETTER_MOVE, BETTER_MOVE, BETTER_MOVE]
     True
     """
-    z = [BETTER_MOVE]*6
-    return z[:m]+[LOSING_MOVE]+z[m+1:]
+    z = [BETTER_MOVE] * 6
+    return z[:m] + [LOSING_MOVE] + z[m + 1:]
 
 
 def winningVector(m):
@@ -44,8 +44,8 @@ def winningVector(m):
                             LOSING_MOVE, LOSING_MOVE, LOSING_MOVE]
     True
     """
-    z = [LOSING_MOVE]*6
-    return z[:m]+[WINNING_MOVE]+z[m+1:]
+    z = [LOSING_MOVE] * 6
+    return z[:m] + [WINNING_MOVE] + z[m + 1:]
 
 
 def moveToVector(m, iswinner):
@@ -113,7 +113,7 @@ class Network():
         moves = s.getLegalMoves(state)
         y = self.sess.run(self.y, {self.x: [state[:14]]})
         scores = list(y[0])
-        options = ([0]*6)[:]
+        options = ([0] * 6)[:]
         for m in moves:
             options[m] = max(0.001, scores[m])
         max_value = max(options)
@@ -144,12 +144,12 @@ class AI(AiBase):
 
     def taunt(self):
         taunts = [
-                'I am learning from this game.',
-                'I am learning your tells.',
-                'How fast are you learning?',
-                'Soon I will have learned everything you know.',
-                'You are teaching me how not to play.',
-                ]
+            'I am learning from this game.',
+            'I am learning your tells.',
+            'How fast are you learning?',
+            'Soon I will have learned everything you know.',
+            'You are teaching me how not to play.',
+        ]
         return random.choice(taunts)
 
     def train(self, data=None, datafile=None):

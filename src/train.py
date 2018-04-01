@@ -1,6 +1,5 @@
 import sys
 import importlib
-from random import randint
 import draw_game
 import game_state as s
 

@@ -72,7 +72,7 @@ def play_series(players, count):
         (winner, moves) = play_game(players)
         for move in moves:
             logMove(move)
-        time_sum += (process_time()-ts)
+        time_sum += (process_time() - ts)
         time_cnt += 1
         avg = (time_sum / max(1, time_cnt))
         template = "Winner: player {} ({}) avg sec: {}"

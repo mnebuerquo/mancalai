@@ -1,3 +1,5 @@
+from random import randint
+
 # +----+----+----+----+----+----+----+----+
 # |    | 12 | 11 | 10 |  9 |  8 |  7 |    |
 # | 13 +----+----+----+----+----+----+  6 |
@@ -65,13 +67,13 @@ def randomState():
     >>> rs = randomState()
     """
     stones = 48
-    state = ([0]*15)[:]
+    state = ([0] * 15)[:]
     bowl = 0
     while stones > 0:
         handful = randint(0, 4)
         state[bowl] += handful
         stones -= handful
-        bowl = (bowl+1) % 14
+        bowl = (bowl + 1) % 14
     return state
 
 
