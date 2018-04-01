@@ -36,14 +36,33 @@ def genMoves(state, movecount=0, chain=[]):
 
 
 def score(state):
-    return 5
+    """
+    Return a numeric score for a board position.
+    >>> score([1, 2, 4, 4, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 0])
+    35
+    """
+    score = 0
+    for p in range(s.NUM_PLAYERS):
+        row = s.getRow(state, p)
+        rcnt = 0
+        for b in row:
+            rcnt += b
+        cnt = s.getBowlCount(state, s.getMancalaIndex(p))
+        if p == s.getCurrentPlayer(state):
+            score -= cnt
+            score -= rcnt
+        else:
+            score += cnt
+            score += rcnt
+    return score
 
 
 def alphaBeta(node, alpha, beta, maximizingPlayer, meta, depth, maxdepth):
-    children = genMoves(node)
+    (nodecount, movecount) = meta
+    (children, movecount) = genMoves(node, movecount)
+    nodecount += 1
     if len(children) == 0 or depth >= maxdepth:
-        meta.countNode()
-        return (score(node), meta)
+        return (score(node), (nodecount, movecount))
     elif maximizingPlayer:
         bestValue = alpha
         for move in children:
@@ -51,7 +70,7 @@ def alphaBeta(node, alpha, beta, maximizingPlayer, meta, depth, maxdepth):
             for m in move:
                 child = s.doMove(child, m)
             cvalue = alphaBeta(child, bestValue, beta, False,
-                               meta, depth + 1, maxdepth)
+                               (nodecount, movecount), depth + 1, maxdepth)
             bestValue = max(bestValue, cvalue)
             if beta <= bestValue:
                 break
@@ -62,11 +81,21 @@ def alphaBeta(node, alpha, beta, maximizingPlayer, meta, depth, maxdepth):
             for m in move:
                 child = s.doMove(child, m)
             cvalue = alphaBeta(child, alpha, bestValue, True,
-                               meta, depth + 1, maxdepth)
+                               (nodecount, movecount), depth + 1, maxdepth)
             bestValue = min(bestValue, cvalue)
             if bestValue <= alpha:
                 break
     return bestValue
+
+
+def iterativeDeepening(state, movelimit, nodelimit):
+    nodecount = 0
+    movecount = 0
+    maxdepth = 2
+    while nodecount < nodelimit and movecount < movelimit:
+        v,m = alphaBeta(state, -9999, +9999, True,
+                  (nodecount, movecount), 0, maxdepth)
+
 
 
 class AI(AiBase):
