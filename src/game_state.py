@@ -59,6 +59,22 @@ def init():
     return newstate
 
 
+def randomState():
+    """
+    Creates a random legal game state.
+    >>> rs = randomState()
+    """
+    stones = 48
+    state = ([0]*15)[:]
+    bowl = 0
+    while stones > 0:
+        handful = randint(0, 4)
+        state[bowl] += handful
+        stones -= handful
+        bowl = (bowl+1) % 14
+    return state
+
+
 def validateIndex(index):
     """
     Is this index on the board at all?
