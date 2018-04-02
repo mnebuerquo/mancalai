@@ -3,23 +3,12 @@ import game_state as s
 import random
 
 
-class Meta():
-    nodecount = 0
-    movecount = 0
-
-    def countNode(self):
-        self.nodecount += 1
-
-    def countMove(self):
-        self.movecount += 1
-
-
 def genMoves(state, movecount=0, chain=[]):
     """
     List possible moves. Moves are a list of moves, because some moves
     result in the player getting to move again.
     >>> genMoves([1, 2, 4, 4, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 0])
-    ([[0], [1], [[2, 0], [2, 1], [2, 3], [2, 4], [2, 5]], [3], [4], [5]], 11)
+    ([[0], [1], [2, 0], [2, 1], [2, 3], [2, 4], [2, 5], [3], [4], [5]], 11)
     """
     player = s.getCurrentPlayer(state)
     new = s.getLegalMoves(state)
@@ -29,7 +18,7 @@ def genMoves(state, movecount=0, chain=[]):
         newstate = s.doMove(state, m)
         if player == s.getCurrentPlayer(newstate):
             r, movecount = genMoves(newstate, movecount, chain + [m])
-            result.append(r)
+            result = result + r
         else:
             result.append(chain + [m])
     return (result, movecount)
@@ -57,35 +46,51 @@ def score(state):
     return score
 
 
-def alphaBeta(node, alpha, beta, maximizingPlayer, meta, depth, maxdepth):
+def applyMove(node, moveseq):
+    child = node[:]
+    for move in moveseq:
+        child = s.doMove(child, move)
+    return child
+
+
+def alphaBeta(node, alpha=-9999, beta=9999, maximizingPlayer=True,
+              meta=(0, 0), depth=0, maxdepth=2):
+    """
+    Do minimax with alpha-beta pruning. Returns the best score and move.
+    >>> state = [1, 2, 4, 4, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 0]
+    >>> result = alphaBeta(state)
+    """
     (nodecount, movecount) = meta
     (children, movecount) = genMoves(node, movecount)
-    nodecount += 1
+    meta = (nodecount + 1, movecount)
+    bestMove = []
     if len(children) == 0 or depth >= maxdepth:
-        return (score(node), (nodecount, movecount))
+        return (score(node), bestMove, meta)
     elif maximizingPlayer:
         bestValue = alpha
-        for move in children:
-            child = node
-            for m in move:
-                child = s.doMove(child, m)
-            cvalue = alphaBeta(child, bestValue, beta, False,
-                               (nodecount, movecount), depth + 1, maxdepth)
+        for moveseq in children:
+            child = applyMove(node, moveseq)
+            cvalue, ccm, meta = alphaBeta(child, bestValue, beta, False,
+                                          meta, depth + 1, maxdepth)
             bestValue = max(bestValue, cvalue)
+            if cvalue > bestValue:
+                bestValue = cvalue
+                bestMove = moveseq
             if beta <= bestValue:
                 break
     else:
         bestValue = beta
-        for move in children:
-            child = node
-            for m in move:
-                child = s.doMove(child, m)
-            cvalue = alphaBeta(child, alpha, bestValue, True,
-                               (nodecount, movecount), depth + 1, maxdepth)
+        for moveseq in children:
+            child = applyMove(node, moveseq)
+            cvalue, ccm, meta = alphaBeta(child, alpha, bestValue, True,
+                                          meta, depth + 1, maxdepth)
             bestValue = min(bestValue, cvalue)
+            if cvalue > bestValue:
+                bestValue = cvalue
+                bestMove = moveseq
             if bestValue <= alpha:
                 break
-    return bestValue
+    return (bestValue, bestMove, meta)
 
 
 def iterativeDeepening(state, movelimit, nodelimit):
@@ -93,9 +98,11 @@ def iterativeDeepening(state, movelimit, nodelimit):
     movecount = 0
     maxdepth = 2
     while nodecount < nodelimit and movecount < movelimit:
-        v,m = alphaBeta(state, -9999, +9999, True,
-                  (nodecount, movecount), 0, maxdepth)
-
+        v, move, meta = alphaBeta(state, -9999, +9999, True,
+                                  (nodecount, movecount), 0, maxdepth)
+        (nodecount, movecount) = meta
+        maxdepth += 1
+    return move
 
 
 class AI(AiBase):
