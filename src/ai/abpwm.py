@@ -47,6 +47,11 @@ def score(state):
 
 
 def applyMove(node, moveseq):
+    """
+    >>> state = [1, 2, 4, 4, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 0]
+    >>> applyMove(state, [2, 3])
+    [1, 2, 0, 0, 7, 8, 2, 13, 12, 10, 9, 8, 7, 0, 1]
+    """
     child = node[:]
     for move in moveseq:
         child = s.doMove(child, move)
@@ -58,7 +63,8 @@ def alphaBeta(node, alpha=-9999, beta=9999, maximizingPlayer=True,
     """
     Do minimax with alpha-beta pruning. Returns the best score and move.
     >>> state = [1, 2, 4, 4, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 0]
-    >>> result = alphaBeta(state)
+    >>> alphaBeta(state)
+    (34, [2, 5], (41, 286))
     """
     (nodecount, movecount) = meta
     (children, movecount) = genMoves(node, movecount)
@@ -72,7 +78,6 @@ def alphaBeta(node, alpha=-9999, beta=9999, maximizingPlayer=True,
             child = applyMove(node, moveseq)
             cvalue, ccm, meta = alphaBeta(child, bestValue, beta, False,
                                           meta, depth + 1, maxdepth)
-            bestValue = max(bestValue, cvalue)
             if cvalue > bestValue:
                 bestValue = cvalue
                 bestMove = moveseq
@@ -84,8 +89,7 @@ def alphaBeta(node, alpha=-9999, beta=9999, maximizingPlayer=True,
             child = applyMove(node, moveseq)
             cvalue, ccm, meta = alphaBeta(child, alpha, bestValue, True,
                                           meta, depth + 1, maxdepth)
-            bestValue = min(bestValue, cvalue)
-            if cvalue > bestValue:
+            if cvalue < bestValue:
                 bestValue = cvalue
                 bestMove = moveseq
             if bestValue <= alpha:
@@ -94,15 +98,26 @@ def alphaBeta(node, alpha=-9999, beta=9999, maximizingPlayer=True,
 
 
 def iterativeDeepening(state, movelimit, nodelimit):
+    """
+    Keep searching to find best move path, increasing search depth every
+    iteration. Stop after evaluating too many moves or nodes.
+    >>> state = [1, 2, 4, 4, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 0]
+    >>> iterativeDeepening(state, 100, 400)
+    2
+    """
     nodecount = 0
     movecount = 0
-    maxdepth = 2
+    maxdepth = 1
+    bestMove = None
+    ladder = {}
     while nodecount < nodelimit and movecount < movelimit:
         v, move, meta = alphaBeta(state, -9999, +9999, True,
                                   (nodecount, movecount), 0, maxdepth)
         (nodecount, movecount) = meta
+        bestMove = move[0] if move else bestMove
+        ladder[maxdepth] = (bestMove, nodecount, movecount)
         maxdepth += 1
-    return move
+    return bestMove
 
 
 class AI(AiBase):
@@ -118,7 +133,4 @@ class AI(AiBase):
         pass
 
     def move(self, state):
-        moves = s.getLegalMoves(state)
-        if not moves:
-            raise s.NoMoves(state)
-        return random.choice(moves)
+        return iterativeDeepening(state, 50000, 500000)
