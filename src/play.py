@@ -18,18 +18,24 @@ class EndGame(Exception):
 class Game():
 
     def setPlayerType(self, player, choice):
+        algo = None
         if choice == 'l':
-            self.player_algorithm[player] = importlib.import_module('ai.luck')
+            algo = importlib.import_module('ai.luck')
+        elif choice == 'm':
+            algo = importlib.import_module('ai.abpwm')
         elif choice == 'n':
-            self.player_algorithm[player] = importlib.import_module('ai.nn')
+            algo = importlib.import_module('ai.nn')
         else:
-            self.player_algorithm[player] = None
+            algo = None
+        if algo:
+            print("player {} is AI".format(player+1))
+            self.player_algorithm[player] = algo.AI()
 
     def choosePlayer(self, player):
         print("Who is player {}?".format(player + 1))
         playertype = ''
-        while playertype not in ['h', 'l', 'n']:
-            prompt = "(H)uman or (L)uck or (N)eural network?: "
+        while playertype not in ['h', 'l', 'n', 'm']:
+            prompt = "(H)uman or (L)uck or (M)inimax or (N)eural network?: "
             playertype = input(prompt).lower()
             self.setPlayerType(player, playertype)
 
