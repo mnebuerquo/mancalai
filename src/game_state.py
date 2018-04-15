@@ -90,7 +90,13 @@ def validateIndex(index):
     Traceback (most recent call last):
         ...
     game_state.InvalidIndex: InvalidIndex: 14
+    >>> validateIndex(None)
+    Traceback (most recent call last):
+        ...
+    game_state.InvalidIndex: InvalidIndex: None
     """
+    if index is None:
+        raise InvalidIndex(None)
     if index >= 0 and index < NUM_PLAYERS * 7:
         return index
     else:
@@ -520,6 +526,18 @@ def flipMove(move, player):
 
     >>> flipMove(1, 0)
     1
+
+    >>> flipMove(3, None)
+    Traceback (most recent call last):
+        ...
+    game_state.InvalidPlayer: InvalidPlayer: None
+
+    >>> flipMove(None, 0) == None
+    True
     """
+    if move is None:
+        return None
+    if player is None:
+        raise InvalidPlayer(player)
     boardsize = NUM_PLAYERS * 7
     return ((move + (player * 7)) % boardsize)

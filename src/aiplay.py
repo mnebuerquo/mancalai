@@ -41,6 +41,8 @@ def play_game(players):
         # do move for someone
         player = s.getCurrentPlayer(game)
         move = players[player]['ai'].move(game)
+        if move is None:
+            print("null move! ", game)
         mt = {
             "move": s.flipMove(move, player),
             "board": s.flipBoardCurrentPlayer(game),
@@ -55,10 +57,7 @@ def play_game(players):
     trainingset = [dict(d, winner=int(winner == d['player'])) for d in moves]
     i = 0
     for p in players:
-        if i == winner:
-            p['ai'].youWin()
-        else:
-            p['ai'].youLose()
+        p['ai'].gameOver(i == winner)
         i += 1
     return (winner, trainingset)
 
@@ -80,11 +79,12 @@ def play_series(players, count):
 
 
 def main(name1="luck", name2="luck", count=1, logfile='trainingmoves.csv'):
+    print("{} vs {} for {} games!".format(name1, name2, count))
     setupLogFile(logfile)
     players = []
     for p in [name1, name2]:
         player = {}
-        player['module'] = importlib.import_module('ai.' + name1)
+        player['module'] = importlib.import_module('ai.' + p)
         player['ai'] = player['module'].AI()
         player['name'] = p
         players.append(player)

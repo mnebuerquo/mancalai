@@ -9,10 +9,7 @@ class AiBase():
     def taunt(self):
         return random.choice(self.taunts)
 
-    def youWin(self):
-        pass
-
-    def youLose(self):
+    def gameOver(self, youWin):
         pass
 
     def train(self, data=None, datafile=None):

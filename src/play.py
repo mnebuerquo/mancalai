@@ -42,24 +42,25 @@ class Game():
     def betweenMoves(self):
         current = s.getCurrentPlayer(self.gamestate)
         module = self.player_algorithm.get(current)
-        isHumanNext = False if module is None else True
+        isHumanNext = True if module is None else False
         while not isHumanNext:
             if s.isGameOver(self.gamestate):
                 raise EndGame(self.gamestate)
             current = s.getCurrentPlayer(self.gamestate)
             module = self.player_algorithm.get(current)
-            isHumanNext = False if module is None else True
-            try:
-                isHumanNext = False
-                print("My move!")
-                move = module.move(self.gamestate)
-                self.gamestate = s.doMove(self.gamestate, move)
-                print(module.taunt())
-            except s.NoMoves as n:
-                print("Oops! I have no moves!")
-                raise EndGame(self.gamestate)
-            except Exception:
-                raise NoAI(current)
+            isHumanNext = True if module is None else False
+            if not isHumanNext:
+                try:
+                    d.drawState(self.gamestate)
+                    print("My move!")
+                    move = module.move(self.gamestate)
+                    self.gamestate = s.doMove(self.gamestate, move)
+                    print(module.taunt())
+                except s.NoMoves as n:
+                    print("Oops! I have no moves!")
+                    raise EndGame(self.gamestate)
+                except Exception:
+                    raise NoAI(current)
         pass
 
     def __init__(self, gamestate):

@@ -33,4 +33,26 @@ end boxes are the bowls where you collect your captured stones.
 
 ## AI 
 
-Coming soon. First game rules, then training an AI to play.
+These are all the AI modules I've added so far. There will be more.
+
+### Dumb Luck
+
+This AI is the trivial case. It chooses randomly from the available legal
+moves. This one should only rarely win a game.
+
+### Minimax
+
+For years, the state of the art in Chess AI was in variations on the Minimax
+algorithm. The basic algorithm is that each player is trying to maximize its
+own score with each move, while minimizing the score of the opposing player.
+Variations on this include Alpha-Beta Pruning, and a database of previously
+scored moves.
+
+### Neural Network
+
+Since [AlphaZero](https://www.chess.com/news/view/google-s-alphazero-destroys-stockfish-in-100-game-match),
+we can expect more use of neural networks for playing board games. My goal
+is to create some basic trained networks using an adversarial approach
+against the Minimax solution, then use the trained networks as trainers for
+new networks and to improve themselves. My first neural network solutions
+are pretty simple, mostly to keep training time short.
