@@ -108,3 +108,6 @@ venv.bak/
 
 #sherman's stuff
 env3/
+data/
+trainingmoves.csv
+_dc
