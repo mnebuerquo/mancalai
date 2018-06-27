@@ -1,0 +1,53 @@
+version: '3.0'
+services:
+  webapi:
+    # https://github.com/maziarz/apistar-docker
+    build: 
+      context: .
+      dockerfile: ./Dockerfile.api
+    command: gunicorn dockerentry:app --workers=4 --bind=0.0.0.0:5000 --pid=pid --worker-class=meinheld.gmeinheld.MeinheldWorker
+    volumes:
+      - ./webapi:/src/webapi:ro
+      - ./mancala:/src/mancala:ro
+    ports:
+      - "5000:5000"
+    expose:
+      - "5000"
+    networks:
+      - mancala
+    logging:
+      options:
+        max-size: "1m"
+        max-file: "1"
+
+  swagger:
+    image: swaggerapi/swagger-ui
+    environment:
+      - API_URL=/schema/
+      #- PORT=8080
+      #- BASE_URL=swagger/
+    ports:
+      - "8080:8080"
+    networks:
+      - mancala
+    logging:
+      options:
+        max-size: "1m"
+        max-file: "1"
+
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx/conf.d/:/etc/nginx/conf.d:ro
+    ports:
+      - "80:80"
+    networks:
+      - mancala
+    logging:
+      options:
+        max-size: "1m"
+        max-file: "1"
+
+networks:
+    mancala:
+        driver: bridge

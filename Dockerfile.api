@@ -1,0 +1,15 @@
+FROM python:3.6
+MAINTAINER Mnebuerquo <mnebuerquo@users.noreply.github.com>
+
+WORKDIR /src
+
+COPY ./requirements.txt ./requirements.txt
+RUN pip install -U -r requirements.txt
+
+EXPOSE 5000
+
+COPY ./mancala /src/mancala
+COPY ./webapi /src/webapi
+COPY ./dockerentry.py /src/dockerentry.py
+
+CMD ["gunicorn", "dockerentry:app", "--workers=4", "--bind=0.0.0.0:5000", "--pid=pid", "--worker-class=meinheld.gmeinheld.MeinheldWorker"]

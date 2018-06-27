@@ -1,4 +1,3 @@
-import json
 from . import AiBase
 import game_state as s
 import datetime
@@ -33,12 +32,12 @@ def incMeta(meta=None, nodecount=0, movecount=0,
 
 def serializeMeta(meta):
     return {
-            "nodecount": meta[0],
-            "movecount": meta[1],
-            "recalled": meta[2],
-            "stored": meta[3],
-            "pruned": meta[4],
-            }
+        "nodecount": meta[0],
+        "movecount": meta[1],
+        "recalled": meta[2],
+        "stored": meta[3],
+        "pruned": meta[4],
+    }
 
 
 def genMoves(state, chain=[]):
@@ -152,7 +151,7 @@ def alphaBeta(node, alpha=-9999, beta=9999, maximizingPlayer=True,
                 meta = incMeta(meta, pruned=1)
                 break
     meta = incMeta(meta, stored=1)
-    movedb.memorizeState(node, maxdepth-depth, bestValue, bestMove)
+    movedb.memorizeState(node, maxdepth - depth, bestValue, bestMove)
     return (bestValue, bestMove, meta)
 
 
@@ -178,7 +177,7 @@ def iterativeDeepening(state, movelimit, nodelimit):
     meta = incMeta()
     while meta[0] < nodelimit and meta[1] < movelimit and maxdepth <= 10:
         (bestMove, meta, maxdepth, ladder) = oneDepth(
-                state, meta, maxdepth, bestMove, ladder)
+            state, meta, maxdepth, bestMove, ladder)
     return (bestMove, ladder)
 
 
@@ -189,7 +188,7 @@ def timedIterativeDeepening(state, timelimit):
     meta = incMeta(timelimit=timelimit)
     while testMetaSeconds(meta):
         (bestMove, meta, maxdepth, ladder) = oneDepth(
-                state, meta, maxdepth, bestMove, ladder)
+            state, meta, maxdepth, bestMove, ladder)
     return (bestMove, ladder)
 
 

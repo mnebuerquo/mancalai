@@ -1,0 +1,3 @@
+#!/bin/sh
+
+docker run -it -w /app -v "$(pwd):/app" node:8 npm $@

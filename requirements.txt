@@ -1,2 +1,4 @@
 tensorflow
 apistar
+gunicorn
+meinheld

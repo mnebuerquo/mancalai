@@ -28,7 +28,7 @@ class Game():
         else:
             algo = None
         if algo:
-            print("player {} is AI".format(player+1))
+            print("player {} is AI".format(player + 1))
             self.player_algorithm[player] = algo.AI()
 
     def choosePlayer(self, player):
