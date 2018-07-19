@@ -1,5 +1,6 @@
 import os
 from apistar import App, Route
+from apistar import types, validators, schema
 from mancala import game_state
 
 LISTEN_ADDR = os.environ.get('LISTEN_ADDR', '127.0.0.1')
@@ -33,13 +34,24 @@ def gameWaitForAI(gameid: str) -> dict:
     return {}
 
 
+class GameState(schema.Object):
+    properties = {
+            "obj_array": schema.Array(items=int)
+            }
+
+
+def gameMoveEvaluate(gamestate: GameState, move: int)-> GameState:
+    return newgamestate
+
+
 routes = [
     Route('/', method='GET', handler=welcome),
     Route('/new', method='POST', handler=gameNew),
     Route('/list', method='GET', handler=gameList),
     Route('/game/{gameid}', method='GET', handler=gameGetState),
     Route('/game/{gameid}/move', method='POST', handler=gameMakeMove),
-    Route('/game/{gameid}/wait', method='GET', handler=gameWaitForAI)
+    Route('/game/{gameid}/wait', method='GET', handler=gameWaitForAI),
+    Route('/move/', method='POST', handler=gameMoveEvaluate)
 
     # put new game
     # name
