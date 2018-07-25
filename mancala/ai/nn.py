@@ -48,16 +48,34 @@ def winningVector(m):
     return z[:m] + [WINNING_MOVE] + z[m + 1:]
 
 
-def moveToVector(m, iswinner):
+def legalVector(state, vector):
     """
-    >>> moveToVector(0, 1) == [WINNING_MOVE, LOSING_MOVE, LOSING_MOVE, \
+    >>> state = [1, 2, 3, 0, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 0]
+    >>> expected = [WINNING_MOVE, WINNING_MOVE, WINNING_MOVE, \
+            LOSING_MOVE, WINNING_MOVE, WINNING_MOVE]
+    >>> legalVector(state, [WINNING_MOVE]*6) == expected
+    True
+    """
+    return [vector[m] if s.isLegalMove(
+        state, m) else LOSING_MOVE for m in range(6)]
+
+
+def moveToVector(state, m, iswinner):
+    """
+    Create a vector of scores for winning moves and losing moves. Treat any
+    illegal move as a losing move.
+
+    >>> state = [1, 2, 3, 4, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 0]
+    >>> moveToVector(state, 0, 1) == [WINNING_MOVE, LOSING_MOVE, LOSING_MOVE, \
                             LOSING_MOVE, LOSING_MOVE, LOSING_MOVE]
     True
-    >>> moveToVector(2, 0) == [BETTER_MOVE, BETTER_MOVE, LOSING_MOVE, \
-                            BETTER_MOVE, BETTER_MOVE, BETTER_MOVE]
+    >>> state = [1, 2, 3, 0, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 0]
+    >>> moveToVector(state, 2, 0) == [BETTER_MOVE, BETTER_MOVE, LOSING_MOVE, \
+                            LOSING_MOVE, BETTER_MOVE, BETTER_MOVE]
     True
     """
-    return winningVector(m) if iswinner else losingVector(m)
+    vector = winningVector(m) if iswinner else losingVector(m)
+    return legalVector(state, vector)
 
 
 class Network():
@@ -110,31 +128,52 @@ class Network():
             self.sess.run(tf.global_variables_initializer())
 
     def getMove(self, state):
-        moves = s.getLegalMoves(state)
+        # get output of neural network
         y = self.sess.run(self.y, {self.x: [state[:14]]})
+        # y is a list containing a single output vector
+        # y == [[0.0108906 0.1377293 0.370027 0.2287382 0.0950692 0.1575449]]
         scores = list(y[0])
-        options = ([0] * 6)[:]
+        bestmove = -1
+        bestscore = -1
+        # we only want to pick from legal moves (the nn will learn these
+        # eventually, but we're helping him with this constraint)
+        moves = s.getLegalMoves(state)
         for m in moves:
-            options[m] = max(0.001, scores[m])
-        max_value = max(options)
-        move = options.index(max_value)
-        return move
+            if bestscore < scores[m]:
+                bestmove = m
+                bestscore = scores[m]
+        if bestmove < 0:
+            bestmove = moves[0]
+        return bestmove
 
     def train_batch(self, batch):
         train_step = tf.train.GradientDescentOptimizer(
             LEARNING_RATE).minimize(self.cross_entropy)
         dfx = [s[:14] for s, m, w in batch]
-        dfy_ = [moveToVector(m, w) for s, m, w in batch]
+        dfy_ = [moveToVector(s, m, w) for s, m, w in batch]
         train_step.run(feed_dict={self.x: dfx, self.y_: dfy_})
         self.saver.save(self.sess, SAVE_PATH)
 
     def train(self, data=None, datafile=None):
+        rows = 0
         if datafile is not None:
             with open(datafile, "r") as infile:
-                head = [json.loads(next(infile)) for x in range(BATCH_SIZE)]
-                self.train_batch(head)
+                head = []
+                for row in infile:
+                    head.append(json.loads(row))
+                    if len(head) >= BATCH_SIZE:
+                        self.train_batch(head)
+                        rows += len(head)
+                        head = []
+                        print(" Trained batch..."
+                if len(head) > 0:
+                    self.train_batch(head)
+                    rows += len(head)
+                    head = []
         if data is not None:
             self.train_batch(data)
+            rows += len(data)
+        print("Trained {} moves.".format(rows))
 
 
 class AI(AiBase):
