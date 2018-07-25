@@ -165,8 +165,8 @@ class Network():
                         self.train_batch(head)
                         rows += len(head)
                         head = []
-                        print(" Trained batch..."
-                if len(head) > 0:
+                        print(" Trained batch...")
+                if head:
                     self.train_batch(head)
                     rows += len(head)
                     head = []
