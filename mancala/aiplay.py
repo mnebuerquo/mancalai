@@ -28,9 +28,6 @@ def setupLogFile(filename):
 
 def logMove(row):
     results.info([row['board'], row['move'], row['winner']])
-    # temp = "Move: {}, Gamestate: {}, Player: {}, Algorithm: {}, IsWinner: {}"
-    # root.info(temp.format(move, gamestate, player, algorithm, winner))
-    # root.info(json.dumps(row))
 
 
 def play_game(players):

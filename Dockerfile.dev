@@ -2,9 +2,12 @@ FROM python:3
 
 WORKDIR /usr/src/app
 
+COPY ./deploy/requirements.ci ./
+RUN pip install --no-cache-dir -r requirements.ci
+
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+# COPY . .
 
-ENTRYPOINT [ "python" ]
+ENTRYPOINT [ "./deploy/dev-entry.sh" ]

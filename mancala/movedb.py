@@ -6,6 +6,9 @@ dirtymoves = 0
 database = {}
 movedbfile = 'data/move-database.db'
 
+# This is a move database for the depth-first alpha-beta pruning with
+# memory ai.
+
 
 def hashNodes(node):
     """
