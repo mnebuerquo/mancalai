@@ -2,6 +2,8 @@ FROM python:3
 
 WORKDIR /usr/src/app
 
+RUN python --version
+
 COPY ./deploy/requirements.ci ./
 RUN pip install --no-cache-dir -r requirements.ci
 
