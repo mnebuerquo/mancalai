@@ -42,6 +42,8 @@ def slash():
 @as_json
 def move():
     """
+    Evaluate a player move and return the new gamestate.
+
     curl -X POST --data \
             '{"gamestate":[4,4,4,4,4,4,0,4,4,4,4,4,4,0,0],"move":4}' \
             http://localhost:5000/move
@@ -59,6 +61,9 @@ def move():
 @as_json
 def aimove():
     """
+    Get the ai move for the current gamestate, as well as the resulting
+    gamestate.
+
     curl -X POST --data \
             '{"gamestate":[4,4,4,4,4,4,0,4,4,4,4,4,4,0,0],"ai-name":"luck"}' \
             http://localhost:5000/aimove
