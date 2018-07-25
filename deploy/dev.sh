@@ -2,6 +2,6 @@
 
 docker run \
 	-it \
-	-p 5000 \
+	-p "5000:5000" \
 	-v "$(pwd):/usr/src/app" \
 	mancalai "$@"
