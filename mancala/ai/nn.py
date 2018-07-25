@@ -3,12 +3,13 @@ import game_state as s
 import random
 import tensorflow as tf
 import json
+from timeit import default_timer as timer
 
 INPUT_SIZE = (s.NUM_PLAYERS * 7)
 OUTPUT_SIZE = 6
 HIDDEN_LAYER_SIZE = 128
 LEARNING_RATE = 0.05
-BATCH_SIZE = 50
+BATCH_SIZE = 5000
 SAVE_PATH = "./data/model.ckpt"
 BETTER_MOVE = 0.5
 WINNING_MOVE = 1
@@ -114,6 +115,9 @@ class Network():
             tf.cast(self.correct_prediction, tf.float32),
             name="accuracy")
 
+        self.train_step = tf.train.GradientDescentOptimizer(
+            LEARNING_RATE).minimize(self.cross_entropy)
+
         self.saver = tf.train.Saver()
 
         self.sess = tf.InteractiveSession()
@@ -137,22 +141,31 @@ class Network():
         bestscore = -1
         # we only want to pick from legal moves (the nn will learn these
         # eventually, but we're helping him with this constraint)
-        moves = s.getLegalMoves(state)
-        for m in moves:
+        legalMoves = s.getLegalMoves(state)
+        for m in legalMoves:
             if bestscore < scores[m]:
                 bestmove = m
                 bestscore = scores[m]
         if bestmove < 0:
-            bestmove = moves[0]
+            bestmove = legalMoves[0]
         return bestmove
 
     def train_batch(self, batch):
-        train_step = tf.train.GradientDescentOptimizer(
-            LEARNING_RATE).minimize(self.cross_entropy)
+        start = timer()
         dfx = [s[:14] for s, m, w in batch]
         dfy_ = [moveToVector(s, m, w) for s, m, w in batch]
-        train_step.run(feed_dict={self.x: dfx, self.y_: dfy_})
+        self.train_step.run(feed_dict={self.x: dfx, self.y_: dfy_})
         self.saver.save(self.sess, SAVE_PATH)
+        end = timer()
+        count = len(batch)
+        diff = end - start
+        rate = count / diff
+        print(
+            "trained batch of len {} in {} sec, at rate {}".format(
+                count,
+                int(diff * 1000) / 1000,
+                int(rate * 1000) / 1000
+            ))
 
     def train(self, data=None, datafile=None):
         rows = 0
@@ -165,7 +178,6 @@ class Network():
                         self.train_batch(head)
                         rows += len(head)
                         head = []
-                        print(" Trained batch...")
                 if head:
                     self.train_batch(head)
                     rows += len(head)
