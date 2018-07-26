@@ -61,7 +61,7 @@ def play_game(players):
 
 def play_series(players, count):
     time_sum = 0
-    time_cnt = 0
+    games = 0
     for i in range(int(count)):
         ts = process_time()
         players = players[::-1]
@@ -69,13 +69,14 @@ def play_series(players, count):
         for move in moves:
             logMove(move)
         time_sum += (process_time() - ts)
-        time_cnt += 1
-        avg = (time_sum / max(1, time_cnt))
-        template = "Winner: player {} ({}) avg sec: {}"
-        root.info(template.format(winner + 1, players[winner]['name'], avg))
+        games += 1
+        avg = (time_sum / max(1, games))
+        template = "Winner: player {} ({}) avg sec: {}, games {}"
+        root.info(template.format(winner + 1, players[winner]['name'],
+                                  avg, games))
 
 
-def main(name1="luck", name2="luck", count=1, logfile='trainingmoves.csv'):
+def main(name1="luck", name2="luck", count=1, logfile='trainingmoves.jsonl'):
     print("{} vs {} for {} games!".format(name1, name2, count))
     setupLogFile(logfile)
     players = []
