@@ -1,3 +1,4 @@
+import sys
 import cmd
 import game_state as s
 import draw_game as d
@@ -25,19 +26,30 @@ class Game():
             algo = importlib.import_module('ai.abpwm')
         elif choice == 'n':
             algo = importlib.import_module('ai.nn')
-        else:
+        elif choice == 'h':
             algo = None
+        else:
+            try:
+                algo = importlib.import_module('ai.' + choice)
+            except BaseException:
+                return False
         if algo:
             print("player {} is AI".format(player + 1))
             self.player_algorithm[player] = algo.AI()
+        return True
 
-    def choosePlayer(self, player):
-        print("Who is player {}?".format(player + 1))
+    def choosePlayer(self, player, opponent=None):
         playertype = ''
-        while playertype not in ['h', 'l', 'n', 'm']:
+        if opponent is not None:
+            playertype = opponent
+            if not self.setPlayerType(player, opponent):
+                playertype = ''
+        while playertype == '':
+            print("Who is player {}?".format(player + 1))
             prompt = "(H)uman or (L)uck or (M)inimax or (N)eural network?: "
             playertype = input(prompt).lower()
-            self.setPlayerType(player, playertype)
+            if not self.setPlayerType(player, playertype):
+                playertype = ''
 
     def betweenMoves(self):
         current = s.getCurrentPlayer(self.gamestate)
@@ -63,12 +75,12 @@ class Game():
                     raise NoAI(current)
         pass
 
-    def __init__(self, gamestate):
+    def __init__(self, opponent):
         self.player_algorithm = {}
         print("Player 1 is human.")
         for player in range(1, s.NUM_PLAYERS):
-            self.choosePlayer(player)
-        self.gamestate = gamestate or s.init()
+            self.choosePlayer(player, opponent)
+        self.gamestate = s.init()
         self.betweenMoves()
 
 
@@ -114,9 +126,9 @@ class GameConsole(cmd.Cmd):
         self.game.betweenMoves()
         self.setPrompt()
 
-    def __init__(self, gamestate=None):
-        super(GameConsole, self).__init__()
-        self.game = Game(gamestate)
+    def __init__(self, opponent=None):
+        super(GameConsole, self).__init__(opponent)
+        self.game = Game(opponent)
         self.game.betweenMoves()
         self.setPrompt()
 
@@ -127,12 +139,12 @@ def gameOver(state):
     print(d.getStateDrawing(state))
 
 
-def run(gamestate=None):
+def run(opponent):
     try:
-        GameConsole(gamestate).cmdloop()
+        GameConsole(opponent).cmdloop()
     except EndGame as e:
         gameOver(e.gamestate)
 
 
 if __name__ == '__main__':
-    run()
+    run(*sys.argv[1:])

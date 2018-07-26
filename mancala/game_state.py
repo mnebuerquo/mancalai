@@ -15,6 +15,7 @@ PLAYER_2_ROW = 7
 PLAYER_TURN = 14
 PLAYER_1 = 0
 PLAYER_2 = 1
+MAX_BEADS = NUM_PLAYERS * 6
 
 
 class NoMoves(Exception):
@@ -372,6 +373,16 @@ def scoreGame(state):
         score = sum(row, score)
         newstate[mindex] = score
     return newstate
+
+
+def getScore(state):
+    """
+    Calculate score for both players.
+
+    >>> getScore([0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 43, 1])
+    (5, 43)
+    """
+    return (state[PLAYER_1_CAPTURES], state[PLAYER_2_CAPTURES])
 
 
 def getWinner(gamestate):

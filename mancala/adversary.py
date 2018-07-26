@@ -52,8 +52,10 @@ def play_one_game(players):
         game = s.doMove(game, move)
         done = s.isGameOver(game)
     winner = s.getWinner(game)
+    score = s.getScore(game)
     # make training set with move, gamestate, and 1 for win, 0 for lose
-    trainingset = [d[0:2] + [int(winner == d[2])] for d in moves]
+    trainingset = [d[0:2] + [int(winner == d[2])] + list(score)[::1 - d[2] * 2]
+                   for d in moves]
     for move in trainingset:
         results.info(move)
     i = 0

@@ -63,7 +63,7 @@ def legalVector(state, vector):
         state, m) else LOSING_MOVE for m in range(6)]
 
 
-def moveToVector(state, m, iswinner):
+def moveToVector(state, m, iswinner, myscore=None, oppscore=None):
     """
     Create a vector of scores for winning moves and losing moves. Treat any
     illegal move as a losing move.
@@ -78,7 +78,11 @@ def moveToVector(state, m, iswinner):
     True
     """
     vector = winningVector(m) if iswinner else losingVector(m)
-    return legalVector(state, vector)
+    if myscore is None or oppscore is None:
+        ratio = 1
+    else:
+        ratio = myscore / s.MAX_BEADS
+    return legalVector(state, [ratio * x for x in vector])
 
 
 class NetworkBase():
@@ -176,8 +180,8 @@ class NetworkBase():
 
     def train_batch(self, batch):
         start = timer()
-        dfx = [s[:14] for s, m, w in batch]
-        dfy_ = [moveToVector(s, m, w) for s, m, w in batch]
+        dfx = [row[0][:14] for row in batch]
+        dfy_ = [moveToVector(*row) for row in batch]
         fd = {
             self.x: dfx,
             self.y_: dfy_,
@@ -185,7 +189,7 @@ class NetworkBase():
         }
         self.train_step.run(
             session=self.sess, feed_dict=fd)
-        self.saver.save(self.sess, SAVE_PATH)
+        self.saver.save(self.sess, self.save_path)
         end = timer()
         count = len(batch)
         diff = end - start

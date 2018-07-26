@@ -61,7 +61,7 @@ def legalVector(state, vector):
         state, m) else LOSING_MOVE for m in range(6)]
 
 
-def moveToVector(state, m, iswinner):
+def moveToVector(state, m, iswinner, myscore=None, oppscore=None):
     """
     Create a vector of scores for winning moves and losing moves. Treat any
     illegal move as a losing move.
@@ -152,8 +152,8 @@ class Network():
 
     def train_batch(self, batch):
         start = timer()
-        dfx = [s[:14] for s, m, w in batch]
-        dfy_ = [moveToVector(s, m, w) for s, m, w in batch]
+        dfx = [row[0][:14] for row in batch]
+        dfy_ = [moveToVector(*row) for row in batch]
         self.train_step.run(feed_dict={self.x: dfx, self.y_: dfy_})
         self.saver.save(self.sess, SAVE_PATH)
         end = timer()
