@@ -100,9 +100,13 @@ class NetworkBase():
         initial = tf.truncated_normal(shape, stddev=0.1)
         return tf.Variable(initial, name=name)
 
+    def initInputPlaceholder(self):
+        self.x = tf.placeholder(tf.float32, shape=[None, INPUT_SIZE], name="x")
+        self.input_size = INPUT_SIZE
+
     def initPlaceholders(self):
         # placeholders for inputs and outputs
-        self.x = tf.placeholder(tf.float32, shape=[None, INPUT_SIZE], name="x")
+        self.initInputPlaceholder()
         self.y_ = tf.placeholder(
             tf.float32, shape=[
                 None, OUTPUT_SIZE], name="y_")
@@ -115,7 +119,7 @@ class NetworkBase():
             lastLayer = self.hiddenParams[-1][-1]
         else:
             layernum = 1
-            lastSize = INPUT_SIZE
+            lastSize = self.input_size
             lastLayer = self.x
         return (layernum, lastSize, lastLayer)
 
@@ -178,9 +182,12 @@ class NetworkBase():
             # start from scratch
             self.sess.run(tf.global_variables_initializer())
 
+    def makeInputVector(self, state):
+        return state[:14]
+
     def train_batch(self, batch):
         start = timer()
-        dfx = [row[0][:14] for row in batch]
+        dfx = [self.makeInputVector(row[0]) for row in batch]
         dfy_ = [moveToVector(*row) for row in batch]
         fd = {
             self.x: dfx,
@@ -226,7 +233,8 @@ class NetworkBase():
             flip = False
             board = state
         # get output of neural network
-        y = self.sess.run(self.y, {self.x: [board[:14]], self.keep_prob: 1.0})
+        fd = {self.x: [self.makeInputVector(board[:14])], self.keep_prob: 1.0}
+        y = self.sess.run(self.y, fd)
         # y is a list containing a single output vector
         # y == [[0.0108906 0.1377293 0.370027 0.2287382 0.0950692 0.1575449]]
         scores = list(y[0])
