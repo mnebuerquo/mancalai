@@ -2,6 +2,8 @@
 
 set -e
 
-./deploy/ci.sh
+if [ "--ci" = "$1" ]; then
+    ./deploy/ci.sh
+fi
 
 python "$@"
