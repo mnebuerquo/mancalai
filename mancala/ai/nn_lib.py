@@ -2,17 +2,16 @@ import game_state as s
 import tensorflow as tf
 import json
 from timeit import default_timer as timer
+from .move_scoring import moveToVector
 
 INPUT_SIZE = (s.NUM_PLAYERS * 7)
 OUTPUT_SIZE = 6
 
-HIDDEN_LAYER_SIZE = 128
-LEARNING_RATE = 0.05
-BATCH_SIZE = 5000
+LEARNING_RATE = 0.01
+BATCH_SIZE = 1000
+EPOCHS = 50
 SAVE_PATH = "./data/"
-BETTER_MOVE = 0.5
-WINNING_MOVE = 1
-LOSING_MOVE = 0
+DROPOUT_PROBABILITY = 0.10
 
 # example code
 # https://github.com/shoreason/tensormnist/blob/master/examples/run_mnist_1.py
@@ -21,68 +20,6 @@ LOSING_MOVE = 0
 def trainingStream(f):
     for jsonline in f:
         yield json.loads(jsonline)
-
-
-def losingVector(m):
-    """
-    Return vector of moves with losing move score set low, and others higher.
-    >>> losingVector(3) == [BETTER_MOVE, BETTER_MOVE, BETTER_MOVE, \
-                            LOSING_MOVE, BETTER_MOVE, BETTER_MOVE]
-    True
-    >>> losingVector(1) == [BETTER_MOVE, LOSING_MOVE, BETTER_MOVE, \
-                            BETTER_MOVE, BETTER_MOVE, BETTER_MOVE]
-    True
-    """
-    z = [BETTER_MOVE] * 6
-    return z[:m] + [LOSING_MOVE] + z[m + 1:]
-
-
-def winningVector(m):
-    """
-    Return vector of moves with winning move score set high, and others low.
-    >>> winningVector(3) == [LOSING_MOVE, LOSING_MOVE, LOSING_MOVE, \
-                            WINNING_MOVE, LOSING_MOVE, LOSING_MOVE]
-    True
-    >>> winningVector(1) == [LOSING_MOVE, WINNING_MOVE, LOSING_MOVE, \
-                            LOSING_MOVE, LOSING_MOVE, LOSING_MOVE]
-    True
-    """
-    z = [LOSING_MOVE] * 6
-    return z[:m] + [WINNING_MOVE] + z[m + 1:]
-
-
-def legalVector(state, vector):
-    """
-    >>> state = [1, 2, 3, 0, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 0]
-    >>> expected = [WINNING_MOVE, WINNING_MOVE, WINNING_MOVE, \
-            LOSING_MOVE, WINNING_MOVE, WINNING_MOVE]
-    >>> legalVector(state, [WINNING_MOVE]*6) == expected
-    True
-    """
-    return [vector[m] if s.isLegalMove(
-        state, m) else LOSING_MOVE for m in range(6)]
-
-
-def moveToVector(state, m, iswinner, myscore=None, oppscore=None):
-    """
-    Create a vector of scores for winning moves and losing moves. Treat any
-    illegal move as a losing move.
-
-    >>> state = [1, 2, 3, 4, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 0]
-    >>> moveToVector(state, 0, 1) == [WINNING_MOVE, LOSING_MOVE, LOSING_MOVE, \
-                            LOSING_MOVE, LOSING_MOVE, LOSING_MOVE]
-    True
-    >>> state = [1, 2, 3, 0, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 0]
-    >>> moveToVector(state, 2, 0) == [BETTER_MOVE, BETTER_MOVE, LOSING_MOVE, \
-                            LOSING_MOVE, BETTER_MOVE, BETTER_MOVE]
-    True
-    """
-    vector = winningVector(m) if iswinner else losingVector(m)
-    if myscore is None or oppscore is None:
-        ratio = 1
-    else:
-        ratio = myscore / s.MAX_BEADS
-    return legalVector(state, [ratio * x for x in vector])
 
 
 class NetworkBase():
@@ -94,7 +31,8 @@ class NetworkBase():
         self.save_path = SAVE_PATH + self.name + '.ckpt'
         self.hiddenSizes = []
         self.hiddenParams = []
-        self.dropout_prob = 0.1
+        self.dropout_prob = DROPOUT_PROBABILITY
+        self.epochs = EPOCHS
 
     def variable(self, shape, name):
         initial = tf.truncated_normal(shape, stddev=0.1)
@@ -187,8 +125,8 @@ class NetworkBase():
 
     def train_batch(self, batch):
         start = timer()
-        dfx = [self.makeInputVector(row[0]) for row in batch]
-        dfy_ = [moveToVector(*row) for row in batch]
+        dfx = [self.makeInputVector(row[0]) for row in batch] * self.epochs
+        dfy_ = [moveToVector(*row) for row in batch] * self.epochs
         fd = {
             self.x: dfx,
             self.y_: dfy_,
@@ -202,7 +140,8 @@ class NetworkBase():
         diff = end - start
         rate = count / diff
         print(
-            "trained batch of len {} in {} sec, at rate {}".format(
+            "{} trained batch of len {} in {} sec, at rate {}".format(
+                self.name,
                 count,
                 int(diff * 1000) / 1000,
                 int(rate * 1000) / 1000
