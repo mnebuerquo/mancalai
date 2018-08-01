@@ -483,8 +483,10 @@ def doMove(state, move):
         newstate[nextBowl] += 1  # drop a stone
     if wasEmpty:
         opposite = getOppositeBowl(nextBowl)
-        captured = newstate[opposite]
-        newstate[opposite] = 0
+        # capture moving piece and opposite bowl count
+        captured = newstate[opposite] + 1
+        newstate[opposite] = 0 # captured opposite
+        newstate[nextBowl] = 0 # captured moving piece
         newstate[getMancalaIndex(player)] += captured
     if not freeTurn:
         newstate[PLAYER_TURN] = nextPlayer(player)
