@@ -30,11 +30,11 @@ def setupLogFile(filename):
     return results
 
 
-def winloss(players, gps):
+def winloss(players, gps, games):
     message = "{} -- {}"
-    pinfo = sorted([(p['name'], p['wins']) for p in players])
+    pinfo = sorted([(p['name'], p['wins'], round(p['wins']/games, 2)) for p in players])
     logger.info(
-        message.format(' '.join(["{}:{}".format(*p) for p in pinfo]), gps))
+        message.format(' '.join(["{}:{}:{}".format(*p) for p in pinfo]), gps))
 
 
 def play_one_game(players):
@@ -89,7 +89,7 @@ def play_games(plist):
         time_sum += (process_time() - ts)
         games += 1
         gps = (max(1, games) / time_sum)
-        winloss(players, gps)
+        winloss(players, gps, games)
 
 
 def main(name1="nn", name2="nn"):

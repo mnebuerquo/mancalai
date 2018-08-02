@@ -1,8 +1,12 @@
+import sys
 import game_state as s
 import tensorflow as tf
 import json
 from timeit import default_timer as timer
 from .move_scoring import moveToVector
+import logging
+
+logger = logging.getLogger(__name__)
 
 INPUT_SIZE = (s.NUM_PLAYERS * 7)
 OUTPUT_SIZE = 6
@@ -28,7 +32,7 @@ class NetworkBase():
         self.name = name
         self.learn_rate = LEARNING_RATE
         self.batch_size = BATCH_SIZE
-        self.save_path = SAVE_PATH + self.name + '.ckpt'
+        self.save_path = SAVE_PATH + self.name
         self.hiddenSizes = []
         self.hiddenParams = []
         self.dropout_prob = DROPOUT_PROBABILITY
@@ -113,11 +117,15 @@ class NetworkBase():
                     tf.train.latest_checkpoint(self.save_path)):
                 self.saver.restore(self.sess, self.save_path)
                 loaded = True
-        except Exception:
+        except Exception as e:
+            logger.exception(repr(e))
+            logger.error("save path: "+self.save_path)
+            sys.exit(1)
             # could not load
             loaded = False
         if not loaded:
             # start from scratch
+            logger.warning("Could not load checkpoint for {}".format(self.name))
             self.sess.run(tf.global_variables_initializer())
 
     def makeInputVector(self, state):
