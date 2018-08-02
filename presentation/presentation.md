@@ -110,12 +110,13 @@ gamestate = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, player]
 
 --
 
-    - A/B pruning may skip a subtree, but if opponent makes a _stupid_ move, then
-       you may need that subtree after all.
+    - A/B pruning may skip a subtree, but if opponent makes an _unexpected_ move, 
+      then you may need that subtree after all. If it is not in your database
+      or cache, you will need to evaluate it.
 
 --
 
-* A pruned subtree might generate a different result at greater depth.
+* A pruned subtree might generate a different result at greater search depth.
 
 --
 
