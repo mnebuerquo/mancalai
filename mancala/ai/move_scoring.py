@@ -26,7 +26,7 @@ def normalizeVector(vector):
     return [x / mx for x in vector]
 
 
-def makeVector(state, m, isWinner, myscore=None, oppscore=None):
+def makeVector(state, m=None, isWinner=None, myscore=None, oppscore=None):
     """
     Create a vector of scores for winning moves and losing moves. Treat any
     illegal move as a losing move.
@@ -38,6 +38,10 @@ def makeVector(state, m, isWinner, myscore=None, oppscore=None):
     >>> state = [1, 2, 3, 0, 5, 6, 0, 12, 11, 7, 9, 8, 7, 0, 0]
     >>> makeVector(state, 2, 0)
     [1, 9, 0, 0, 2, 2]
+
+    >>> state = [1, 2, 3, 0, 5, 6, 0, 12, 11, 7, 9, 8, 7, 0, 0]
+    >>> makeVector(state)
+    [1, 9, 1, 0, 2, 2]
     """
     score_now = s.getScore(state)
     vector = ([0] * 6)[:]
@@ -59,8 +63,8 @@ def makeVector(state, m, isWinner, myscore=None, oppscore=None):
             # illegal, always zero
             vector[move] = 0
         vector[move] = max(0, vector[move])
-    return vector
+    return vector[:6]
 
 
-def moveToVector(state, m, isWinner, myscore=None, oppscore=None):
+def moveToVector(state, m=None, isWinner=None, myscore=None, oppscore=None):
     return normalizeVector(makeVector(state, m, isWinner, myscore, oppscore))
