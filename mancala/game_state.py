@@ -455,7 +455,7 @@ def doMove(state, move):
     [1, 2, 3, 4, 0, 7, 1, 13, 12, 11, 9, 8, 7, 0, 1]
 
     >>> doMove([1, 0, 3, 4, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 0], 0)
-    [0, 1, 3, 4, 5, 6, 8, 12, 11, 10, 9, 0, 7, 0, 1]
+    [0, 0, 3, 4, 5, 6, 9, 12, 11, 10, 9, 0, 7, 0, 1]
 
     >>> doMove([1, 2, 4, 4, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 0], 2)
     [1, 2, 0, 5, 6, 7, 1, 12, 11, 10, 9, 8, 7, 0, 0]
@@ -485,8 +485,8 @@ def doMove(state, move):
         opposite = getOppositeBowl(nextBowl)
         # capture moving piece and opposite bowl count
         captured = newstate[opposite] + 1
-        newstate[opposite] = 0 # captured opposite
-        newstate[nextBowl] = 0 # captured moving piece
+        newstate[opposite] = 0  # captured opposite
+        newstate[nextBowl] = 0  # captured moving piece
         newstate[getMancalaIndex(player)] += captured
     if not freeTurn:
         newstate[PLAYER_TURN] = nextPlayer(player)

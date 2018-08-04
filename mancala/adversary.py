@@ -32,7 +32,8 @@ def setupLogFile(filename):
 
 def winloss(players, gps, games):
     message = "{} -- {}"
-    pinfo = sorted([(p['name'], p['wins'], round(p['wins']/games, 2)) for p in players])
+    pinfo = sorted([(p['name'], p['wins'], round(p['wins'] / games, 2))
+                    for p in players])
     logger.info(
         message.format(' '.join(["{}:{}:{}".format(*p) for p in pinfo]), gps))
 

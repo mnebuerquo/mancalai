@@ -1,4 +1,3 @@
-import sys
 import game_state as s
 import tensorflow as tf
 import json
@@ -112,20 +111,16 @@ class NetworkBase():
         # https://stackoverflow.com/q/41791469/5114
         self.sess = tf.Session()
         try:
-            # load trained network from file if it exists
-            if tf.train.checkpoint_exists(
-                    tf.train.latest_checkpoint(self.save_path)):
-                self.saver.restore(self.sess, self.save_path)
-                loaded = True
+            self.saver.restore(self.sess, self.save_path)
+            loaded = True
         except Exception as e:
-            logger.exception(repr(e))
-            logger.error("save path: "+self.save_path)
-            sys.exit(1)
             # could not load
             loaded = False
         if not loaded:
             # start from scratch
-            logger.warning("Could not load checkpoint for {}".format(self.name))
+            logger.warning(
+                "Could not load checkpoint for {}".format(
+                    self.name))
             self.sess.run(tf.global_variables_initializer())
 
     def makeInputVector(self, state):
@@ -160,7 +155,7 @@ class NetworkBase():
         head = []
         for row in datastream:
             head.append(row)
-            if len(head) >= BATCH_SIZE:
+            if len(head) >= self.batch_size:
                 self.train_batch(head)
                 rows += len(head)
                 head = []
