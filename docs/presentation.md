@@ -111,9 +111,9 @@ It just picks a random move from the set of legal moves.
 
 ---
 
-# Tricks and Problems with Depth-First Search
+# Limitations of Depth-First Search
 
-* Time complexity is explosive.
+Time complexity is explosive.
 
 --
 
@@ -129,7 +129,7 @@ It just picks a random move from the set of legal moves.
 
 --
 
-* A pruned subtree might generate a different result at greater search depth.
+A pruned subtree might generate a different result at greater search depths.
 
 --
 
@@ -215,10 +215,9 @@ Shapes I have tried:
 
 # Generating Training Data
 
-Play thousands of games.
-Save move history of every game played.
-Saved as JSON Lines, files contain the same fields:
-
+* Play thousands of games.
+* Save move history of every game played.
+* Saved as JSON Lines, files contain the same fields:
 	- Game State
 	- Selected Move
 	- Who won
@@ -231,20 +230,23 @@ Saved as JSON Lines, files contain the same fields:
 1. Play games between two AI strategies in batches of N games each.
 2. After each batch, do additional training using the games just played.
 
-Both players learn from all the games. Game play should improve as the
-players continue playing.
+Both players learn from all the games. 
+
+Game play should improve as the players continue playing.
 
 ---
 
 # Retraining from History
 
 Replay all saved moves to train selected network.
+
 Repeat as many times as desired.
 
 ---
 
 # References
 
+* [Mancala Board on Amazon](https://www.amazon.com/Square-Root-00015-Mancala/dp/B001V9HJ1W)
 * [Depth-First Search](https://en.wikipedia.org/wiki/Depth-first_search)
 * [Alpha-Beta Pruning](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning)
 * [About Neural Networks](https://towardsdatascience.com/machine-learning-fundamentals-ii-neural-networks-f1e7b2cb3eef)

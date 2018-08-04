@@ -1,5 +1,9 @@
 # Mancala AI Experiment
 
+## Presentation
+
+[View the Slide Show (https://mnebuerquo.github.io/mancalai/)](https://mnebuerquo.github.io/mancalai/)
+
 ## Rules for Mancala
 
 [As found on the interwebs](https://www.thespruce.com/how-to-play-mancala-409424):
@@ -48,11 +52,15 @@ own score with each move, while minimizing the score of the opposing player.
 Variations on this include Alpha-Beta Pruning, and a database of previously
 scored moves.
 
-### Neural Network
+I implemented a basic version of depth first minimax search. This is slow,
+especially in python, so I have not used it for training the neural networks.
+
+### Neural Networks
 
 Since [AlphaZero](https://www.chess.com/news/view/google-s-alphazero-destroys-stockfish-in-100-game-match),
 we can expect more use of neural networks for playing board games. My goal
 is to create some basic trained networks using an adversarial approach
 against the Minimax solution, then use the trained networks as trainers for
-new networks and to improve themselves. My first neural network solutions
-are pretty simple, mostly to keep training time short.
+new networks and to improve themselves.
+
+Most of this repo is about training neural networks to play.
