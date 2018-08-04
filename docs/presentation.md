@@ -3,6 +3,28 @@
 
 ---
 
+# Rules - The board
+
+1. The Mancala board is made up of two rows of six holes, or pits, each. If you don't have a Mancala board handy, substitute an empty egg carton.
+1. Four pieces—marbles, chips, or stones—are placed in each of the 12 holes. The color of the pieces is irrelevant.
+1. Each player has a store (called a Mancala) to the right side of the Mancala board. (Cereal bowls work well for this purpose if you're using an egg carton.)
+
+---
+
+# Rules - Gameplay
+
+1. The game begins with one player picking up all of the pieces in any one of the holes on his side.
+1. Moving counter-clockwise, the player deposits one of the stones in each hole until the stones run out.
+1. If you run into your own store, deposit one piece in it. If you run into your opponent's store, skip it.
+1. If the last piece you drop is in your own store, you get a free turn.
+1. If the last piece you drop is in an empty hole on your side, you capture that piece and any pieces in the hole directly opposite.
+1. Always place all captured pieces in your store.
+1. The game ends when all six spaces on one side of the Mancala board are empty.
+1. The player who still has pieces on his side of the board when the game ends capture all of those pieces.
+1. Count all the pieces in each store. The winner is the player with the most pieces.
+
+---
+
 # Where to start?
 
 Represent both the state of the game and the rules in Python.
@@ -44,33 +66,24 @@ gamestate = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, player]
 
 ---
 
-# Rules - The board
-
-1. The Mancala board is made up of two rows of six holes, or pits, each. If you don't have a Mancala board handy, substitute an empty egg carton.
-1. Four pieces—marbles, chips, or stones—are placed in each of the 12 holes. The color of the pieces is irrelevant.
-1. Each player has a store (called a Mancala) to the right side of the Mancala board. (Cereal bowls work well for this purpose if you're using an egg carton.)
-
----
-
-# Rules - Gameplay
-
-1. The game begins with one player picking up all of the pieces in any one of the holes on his side.
-1. Moving counter-clockwise, the player deposits one of the stones in each hole until the stones run out.
-1. If you run into your own store, deposit one piece in it. If you run into your opponent's store, skip it.
-1. If the last piece you drop is in your own store, you get a free turn.
-1. If the last piece you drop is in an empty hole on your side, you capture that piece and any pieces in the hole directly opposite.
-1. Always place all captured pieces in your store.
-1. The game ends when all six spaces on one side of the Mancala board are empty.
-1. The player who still has pieces on his side of the board when the game ends capture all of those pieces.
-1. Count all the pieces in each store. The winner is the player with the most pieces.
-
----
-
 # AI Game Play
 
 * Luck (pick a random legal move)
 * Depth-first search (minimax algorithm, alpha-beta pruning)
 * Machine Learning!
+
+---
+
+# Luck
+
+This is not really an AI, but a placeholder which was trivial to implement.
+
+```python
+    moves = getLegalMoves(gamestate)
+    return random.choice(moves)
+```
+
+It just picks a random move from the set of legal moves.
 
 ---
 
@@ -131,4 +144,107 @@ gamestate = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, player]
 
 ---
 
+# Machine Learning
 
+* Depth-first search is brute force
+    - Takes a long time to search for best move
+    - Requires faster hardware for better skill
+* Neural Networks actually learn to play
+    - Cost is all in training time.
+    - Trained neural network requires minimal hardware.
+
+---
+
+# How does a Neural Network work?
+
+A Neural Network receives a set of inputs, applies mathematical
+functions to those inputs, and generates output values.
+
+<img src="https://cdn-images-1.medium.com/max/1600/1*DW0Ccmj1hZ0OvSXi7Kz5MQ.jpeg" title="Neural Network" style="width:60%; height:auto;"/>
+
+---
+
+# Inputs
+
+Recall we treated the board state as a Python list:
+```python
+    [4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0, 0]
+```
+
+* This is an input layer with 14 neurons (12 if we omit the mancalas where we
+  keep score). 
+* Each neuron gets the integer count of beads in a bowl as its input.
+* We rotate the board in the data structure, so the player always appears to be
+  player 1.
+
+---
+
+# Output
+
+The output layer indicates which move to make. 
+
+* There can be up to 6 possible moves, each corresponding to one bowl.
+* The output layer emits 6 values between 0 and 1, each representing a move.
+* The highest output value indicates the chosen move.
+
+If the chosen move is not legal (no beads in that cup) then pick the next
+highest.
+
+---
+
+# Hidden Layers
+
+This is where the magic happens. We can have any number of hidden layers, in
+any shape. Adding more neurons increases training time, so be careful.
+
+Shapes I have tried:
+
+* 1 hidden layer, 128 neurons
+* 2 hidden layers, 80 neurons each
+* 3 hidden layers, 80 neurons each
+
+---
+
+# Training and Learning
+
+* Generate Training Data
+* Adversarial Training
+* Retraining from History
+
+---
+
+# Generating Training Data
+
+Play thousands of games.
+Save move history of every game played.
+Saved as JSON Lines, files contain the same fields:
+
+	- Game State
+	- Selected Move
+	- Who won
+	- Score for each player
+
+---
+
+# Adversarial Training
+
+1. Play games between two AI strategies in batches of N games each.
+2. After each batch, do additional training using the games just played.
+
+Both players learn from all the games. Game play should improve as the
+players continue playing.
+
+---
+
+# Retraining from History
+
+Replay all saved moves to train selected network.
+Repeat as many times as desired.
+
+---
+
+# References
+
+* [Depth-First Search](https://en.wikipedia.org/wiki/Depth-first_search)
+* [Alpha-Beta Pruning](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning)
+* [About Neural Networks](https://towardsdatascience.com/machine-learning-fundamentals-ii-neural-networks-f1e7b2cb3eef)
