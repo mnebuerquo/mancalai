@@ -1,6 +1,6 @@
 # mancala-presentation
 
-[View the Slide Show (https://myname.github.io/this-repo/)](https://myname.github.io/this-repo/)
+[View the Slide Show (https://mnebuerquo.github.io/mancalai/)](https://mnebuerquo.github.io/mancalai/)
 
 ## About
 
