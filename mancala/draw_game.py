@@ -43,8 +43,8 @@ def _boardRow(state, rowOffset):
 def colorState(state, oldstate=None):
     if oldstate is None:
         oldstate = state
-    newstate = ['']*14
-    for i in range(len(state)-1):
+    newstate = [''] * 14
+    for i in range(len(state) - 1):
         diff = state[i] - oldstate[i]
         if diff < 0:
             color = 'red'

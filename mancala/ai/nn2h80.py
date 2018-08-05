@@ -22,8 +22,8 @@ class AI(AiBase):
 
     def taunt(self):
         taunts = [
-                "I'm twice as smart.",
-                "I could beat two of you at once.",
+            "I'm twice as smart.",
+            "I could beat two of you at once.",
         ]
         return random.choice(taunts)
 

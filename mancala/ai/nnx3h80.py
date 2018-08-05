@@ -60,9 +60,9 @@ class AI(AiBase):
 
     def taunt(self):
         taunts = [
-                'I look at the board in a different way.',
-                "I'll win this one for sure.",
-                "I have three layers of awesomeness.",
+            'I look at the board in a different way.',
+            "I'll win this one for sure.",
+            "I have three layers of awesomeness.",
         ]
         return random.choice(taunts)
 

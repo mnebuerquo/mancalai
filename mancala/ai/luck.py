@@ -17,7 +17,6 @@ class AI(AiBase):
     ]
 
     def move(self, state):
-        print("luck")
         moves = s.getLegalMoves(state)
         if not moves:
             raise s.NoMoves(state)

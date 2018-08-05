@@ -6,7 +6,8 @@ import importlib
 from termcolor import cprint
 
 
-PLAYER_COLORS = [ 'yellow', 'magenta' ]
+PLAYER_COLORS = ['yellow', 'magenta']
+
 
 class NoAI(Exception):
     def __init__(self, ptype):
@@ -49,7 +50,10 @@ class Game():
             if not self.setPlayerType(player, opponent):
                 playertype = ''
         while playertype == '':
-            cprint("Who is player {}?".format(player + 1), PLAYER_COLORS[player])
+            cprint(
+                "Who is player {}?".format(
+                    player + 1),
+                PLAYER_COLORS[player])
             prompt = "(H)uman or (L)uck or (M)inimax or (N)eural network?: "
             playertype = input(prompt).lower()
             if not self.setPlayerType(player, playertype):

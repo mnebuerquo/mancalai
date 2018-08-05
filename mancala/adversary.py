@@ -4,6 +4,8 @@ import sys
 from time import process_time
 import logging
 from logging.handlers import RotatingFileHandler
+from ai import luck
+import random
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -16,6 +18,15 @@ logger.addHandler(ch)
 
 results = logging.getLogger('results')
 results.setLevel(logging.INFO)
+
+BASE_PERCENT = .37
+
+
+def needRandomMove(numMoves):
+    pctchance = BASE_PERCENT / (numMoves + 1)
+    if random.random() < pctchance:
+        return True
+    return False
 
 
 def trainingRow(row):
@@ -38,14 +49,17 @@ def winloss(players, gps, games):
         message.format(' '.join(["{}:{}:{}".format(*p) for p in pinfo]), gps))
 
 
-def play_one_game(players):
+def play_one_game(players, lucky):
     game = s.init()
     done = False
     moves = []
     while not done:
         # do move for someone
         player = s.getCurrentPlayer(game)
-        move = players[player]['ai'].move(game)
+        if needRandomMove(len(moves)):
+            move = lucky.move(game)
+        else:
+            move = players[player]['ai'].move(game)
         if move is None:
             logger.error("null move! ", game)
         mt = [s.flipBoardCurrentPlayer(game), s.flipMove(move, player), player]
@@ -68,7 +82,7 @@ def play_one_game(players):
     return (winner, trainingset)
 
 
-def play_games(plist):
+def play_games(plist, lucky):
     batch_size = 5000
     trainingGames = 100
     players = plist[:]
@@ -79,7 +93,7 @@ def play_games(plist):
     while True:
         ts = process_time()
         players = players[::-1]
-        (winner, moves) = play_one_game(players)
+        (winner, moves) = play_one_game(players, lucky)
         training += moves
         tgames += 1
         if len(training) >= batch_size or tgames >= trainingGames:
@@ -99,6 +113,7 @@ def main(name1="nn", name2="nn"):
     try:
         logger.info("{} vs {}! Begin!".format(name1, name2))
         players = []
+        lucky = luck.AI()
         for p in [name1, name2]:
             player = {}
             player['module'] = importlib.import_module('ai.' + p)
@@ -107,7 +122,7 @@ def main(name1="nn", name2="nn"):
             player['wins'] = 0
             players.append(player)
         # infinite loop here
-        play_games(players)
+        play_games(players, lucky)
     except KeyboardInterrupt:
         pass
 
