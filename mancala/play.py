@@ -3,7 +3,10 @@ import cmd
 import game_state as s
 import draw_game as d
 import importlib
+from termcolor import cprint
 
+
+PLAYER_COLORS = [ 'yellow', 'magenta' ]
 
 class NoAI(Exception):
     def __init__(self, ptype):
@@ -14,6 +17,7 @@ class EndGame(Exception):
     def __init__(self, gamestate):
         Exception.__init__(self, "Game Over.")
         self.gamestate = gamestate
+        self.priorstate = gamestate[:]
 
 
 class Game():
@@ -34,7 +38,7 @@ class Game():
             except BaseException:
                 return False
         if algo:
-            print("player {} is AI".format(player + 1))
+            cprint("player {} is AI".format(player + 1), PLAYER_COLORS[player])
             self.player_algorithm[player] = algo.AI()
         return True
 
@@ -45,7 +49,7 @@ class Game():
             if not self.setPlayerType(player, opponent):
                 playertype = ''
         while playertype == '':
-            print("Who is player {}?".format(player + 1))
+            cprint("Who is player {}?".format(player + 1), PLAYER_COLORS[player])
             prompt = "(H)uman or (L)uck or (M)inimax or (N)eural network?: "
             playertype = input(prompt).lower()
             if not self.setPlayerType(player, playertype):
@@ -63,13 +67,14 @@ class Game():
             isHumanNext = True if module is None else False
             if not isHumanNext:
                 try:
-                    d.drawState(self.gamestate)
-                    print("My move!")
+                    d.drawState(self.gamestate, self.priorstate)
+                    cprint("My move!", PLAYER_COLORS[current])
                     move = module.move(self.gamestate)
+                    self.priorstate = self.gamestate[:]
                     self.gamestate = s.doMove(self.gamestate, move)
-                    print(module.taunt())
+                    cprint(module.taunt(), PLAYER_COLORS[current])
                 except s.NoMoves as n:
-                    print("Oops! I have no moves!")
+                    cprint("Oops! I have no moves!", PLAYER_COLORS[current])
                     raise EndGame(self.gamestate)
                 except Exception:
                     raise NoAI(current)
@@ -77,10 +82,11 @@ class Game():
 
     def __init__(self, opponent):
         self.player_algorithm = {}
-        print("Player 1 is human.")
+        cprint("Player 1 is human.", PLAYER_COLORS[0])
         for player in range(1, s.NUM_PLAYERS):
             self.choosePlayer(player, opponent)
         self.gamestate = s.init()
+        self.priorstate = self.gamestate[:]
         self.betweenMoves()
 
 
@@ -90,7 +96,7 @@ class GameConsole(cmd.Cmd):
     def setPrompt(self):
         names = ["Player 1", "Player 2"]
         promptlines = [
-            d.getStateDrawing(self.game.gamestate),
+            d.getStateDrawing(self.game.gamestate, self.game.priorstate),
             d.getCommandOptionsLine(),
             names[s.getCurrentPlayer(self.game.gamestate)] + ': '
         ]
@@ -103,6 +109,7 @@ class GameConsole(cmd.Cmd):
         opts = ['A', 'B', 'C', 'D', 'E', 'F']
         try:
             move = s.translateMove(self.game.gamestate, opts.index(c))
+            self.game.priorstate = self.game.gamestate[:]
             self.game.gamestate = s.doMove(self.game.gamestate, move)
             if s.isGameOver(self.game.gamestate):
                 raise EndGame(self.game.gamestate)

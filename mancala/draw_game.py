@@ -1,5 +1,6 @@
 # just drawing stuff, no actual content here
 import game_state as gs
+from termcolor import colored
 
 CELL_WIDTH = 5
 
@@ -39,7 +40,25 @@ def _boardRow(state, rowOffset):
     return ('|' + '|'.join(cells) + '|', gs.PLAYER_1_ROW)
 
 
-def getStateDrawing(state):
+def colorState(state, oldstate=None):
+    if oldstate is None:
+        oldstate = state
+    newstate = ['']*14
+    for i in range(len(state)-1):
+        diff = state[i] - oldstate[i]
+        if diff < 0:
+            color = 'red'
+        elif diff == 0:
+            color = 'cyan'
+        else:
+            color = 'green'
+        c = _cellNumber(state[i])
+        newstate[i] = colored(c, color)
+    return newstate
+
+
+def getStateDrawing(state, oldstate=None):
+    state = colorState(state, oldstate)
     scanlines = [
         _boardEdge,
         _boardGap, _boardRow, _boardGap,
@@ -55,8 +74,8 @@ def getStateDrawing(state):
     return "\n".join(output)
 
 
-def drawState(state):
-    print(getStateDrawing(state))
+def drawState(state, oldstate=None):
+    print(getStateDrawing(state, oldstate))
 
 
 def getCommandOptionsLine():

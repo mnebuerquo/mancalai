@@ -60,11 +60,9 @@ class AI(AiBase):
 
     def taunt(self):
         taunts = [
-            'I am learning from this game.',
-            'I am learning your tells.',
-            'How fast are you learning?',
-            'Soon I will have learned everything you know.',
-            'You are teaching me how not to play.',
+                'I look at the board in a different way.',
+                "I'll win this one for sure.",
+                "I have three layers of awesomeness.",
         ]
         return random.choice(taunts)
 

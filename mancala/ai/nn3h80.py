@@ -23,8 +23,9 @@ class AI(AiBase):
 
     def taunt(self):
         taunts = [
-            'I have three hidden layers.',
+            'I have three hidden layers. How many do you have?',
             'I might be three times as smart as you.',
+            'I could beat you in like three seconds if I want to.',
         ]
         return random.choice(taunts)
 

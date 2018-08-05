@@ -8,7 +8,9 @@ class AI(AiBase):
     taunts = [
         "I want all the beads.",
         "I'm going to win it all.",
-        "Oops. I did it again."
+        "Oops. I did it again.",
+        "You're on the ropes now.",
+        "I've got you right where I want you.",
     ]
 
     def move(self, state):
