@@ -236,11 +236,25 @@ Game play should improve as the players continue playing.
 
 ---
 
-# Retraining from History
+# Learning from Repeated Training
 
-Replay all saved moves to train selected network.
-
-Repeat as many times as desired.
+1. Scoring of moves by outcome of game
+	- Between 0 and 1
+	- Illegal moves to 0
+	- Move scored 1 if game was won
+	- Move scored 0 (other moves 1) if game was lost
+2. Alternate who moves first
+3. Inject some randomness
+	- A NN is deterministic
+	- Needed variety of game states for training
+4. Input encoding
+	- array of bead counts
+	- one-hot encoding
+5. Back to scoring
+	- Bonus for captures
+	- Bonus for extra moves
+	- Still scoring moves higher for game outcome
+	- This basically trains a greedy algorithm into NN
 
 ---
 
@@ -250,3 +264,4 @@ Repeat as many times as desired.
 * [Depth-First Search](https://en.wikipedia.org/wiki/Depth-first_search)
 * [Alpha-Beta Pruning](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning)
 * [About Neural Networks](https://towardsdatascience.com/machine-learning-fundamentals-ii-neural-networks-f1e7b2cb3eef)
+* [Article about Mancala and AI](https://towardsdatascience.com/the-ancient-game-and-the-ai-d7704bea280d)
