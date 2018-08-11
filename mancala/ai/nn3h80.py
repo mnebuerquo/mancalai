@@ -1,6 +1,6 @@
-from . import AiBase
 import random
-from .nn_lib import NetworkBase, trainingStream
+from .lib import AiBase
+from .lib.nn_lib import NetworkBase, trainingStream
 
 
 class Network(NetworkBase):

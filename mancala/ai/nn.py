@@ -1,7 +1,7 @@
 # This implementation is deprecated and no longer works. It has been
 # generalized a bit more in nn_lib.py.
 # See nn1h128.py for a working instantiation.
-from . import AiBase
+from .lib import AiBase
 import game_state as s
 import random
 import tensorflow as tf

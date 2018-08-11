@@ -1,5 +1,5 @@
-from . import AiBase
-from .move_scoring import moveToVector
+from .lib import AiBase
+from .lib.move_scoring import moveToVector
 import game_state as s
 
 

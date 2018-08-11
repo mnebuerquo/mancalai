@@ -1,7 +1,6 @@
-from . import AiBase
 import random
-from .nn_lib import NetworkBase, trainingStream
-from .nn_lib import INPUT_SIZE
+from .lib import AiBase
+from .lib.nn_lib import NetworkBase, trainingStream, INPUT_SIZE
 import tensorflow as tf
 MAX_BEADS = 48
 

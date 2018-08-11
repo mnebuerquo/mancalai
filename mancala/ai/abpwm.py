@@ -1,4 +1,4 @@
-from . import AiBase
+from .lib import AiBase
 import game_state as s
 import datetime
 import movedb
