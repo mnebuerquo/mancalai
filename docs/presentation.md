@@ -243,18 +243,44 @@ Game play should improve as the players continue playing.
 	- Illegal moves to 0
 	- Move scored 1 if game was won
 	- Move scored 0 (other moves 1) if game was lost
+
+--
+
 2. Alternate who moves first
+
+--
+
 3. Inject some randomness
 	- A NN is deterministic
 	- Needed variety of game states for training
+
+--
+
 4. Input encoding
 	- array of bead counts
 	- one-hot encoding
+
+--
+
 5. Back to scoring
 	- Bonus for captures
 	- Bonus for extra moves
 	- Still scoring moves higher for game outcome
 	- This basically trains a greedy algorithm into NN
+
+---
+
+# How do they do?
+
+|          |    greedy|      luck|   nn1h128|    nn2h80|    nn3h80|  nnx1h128|   nnx3h80|
+|:---------|---------:|---------:|---------:|---------:|---------:|---------:|---------:|
+|    greedy|          |       100|       100|         0|       100|       100|       100|
+|      luck|         0|          |         3|         1|         3|         5|         0|
+|   nn1h128|       100|        97|          |       100|       100|       100|       100|
+|    nn2h80|       100|       100|       100|          |       100|       100|       100|
+|    nn3h80|       100|       100|       100|         0|          |       100|       100|
+|  nnx1h128|       100|        99|       100|         0|       100|          |       100|
+|   nnx3h80|       100|        99|       100|         0|       100|       100|          |
 
 ---
 

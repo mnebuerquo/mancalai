@@ -1,17 +1,26 @@
 import random
 from .lib import AiBase
-from .lib.nn_lib import NetworkBase, trainingStream
+from .lib.nn_lib import NetworkBase, trainingStream, INPUT_SIZE
+import tensorflow as tf
 
 
 class Network(NetworkBase):
+
+    def initInputPlaceholder(self):
+        self.x = tf.placeholder(
+            tf.float32,
+            shape=(None, 6, 2, 1),
+            name="x")
+
+    def makeInputVector(self, state):
+        return [state[0:6],state[7:13]]
 
     def __init__(self, name):
         super().__init__(name)
         with self.graph.as_default():
             self.initPlaceholders()
-            self.addHiddenLayer(80)
-            self.addHiddenLayer(80)
-            self.addHiddenLayer(80)
+            self.addConvLayer()
+            self.addHiddenLayer(128)
             self.initOutputLayer()
             self.initCostFn()
             self.initSession()
@@ -24,9 +33,9 @@ class AI(AiBase):
 
     def taunt(self):
         taunts = [
-            'I have three hidden layers. How many do you have?',
-            'I might be three times as smart as you.',
-            'I could beat you in like three seconds if I want to.',
+            'I look at the board in a different way.',
+            "I'll win this one for sure.",
+            "You're not as good looking as I am.",
         ]
         return random.choice(taunts)
 

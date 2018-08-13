@@ -389,18 +389,27 @@ def getWinner(gamestate):
     """
     Returns the index of the winner of the game.
 
-    >>> getWinner([0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 57, 1])
+    >>> getWinner([0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 9, 1])
     1
+
+    >>> getWinner([0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 8, 1])
+    0
+
+    >>> getWinner([0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 9, 1])
+    -1
     """
     if not isGameOver(gamestate):
         raise GameNotOver()
     winner = -1
-    score = 0
+    score = -1
     for player in range(NUM_PLAYERS):
         c = getBowlCount(gamestate, getMancalaIndex(player))
         if c > score:
             score = c
             winner = player
+        elif c == score:
+            winner = -1
+
     return winner
 
 

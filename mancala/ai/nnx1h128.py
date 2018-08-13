@@ -43,11 +43,12 @@ class Network(NetworkBase):
 
     def __init__(self, name):
         super().__init__(name)
-        self.initPlaceholders()
-        self.addHiddenLayer(128)
-        self.initOutputLayer()
-        self.initCostFn()
-        self.initSession()
+        with self.graph.as_default():
+            self.initPlaceholders()
+            self.addHiddenLayer(128)
+            self.initOutputLayer()
+            self.initCostFn()
+            self.initSession()
 
 
 class AI(AiBase):
