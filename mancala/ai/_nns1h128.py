@@ -8,68 +8,39 @@ class Network(NetworkBase):
     def initInputPlaceholder(self):
         self.x = tf.placeholder(
             tf.float32,
-            shape=(None, 6, 2, 1),
+            shape=(None, 2, 6, 1),
             name="x")
 
     def conv2d(self, x, W, b, strides=1):
         # Conv2D wrapper, with bias and relu activation
-        x = tf.nn.conv2d(x, W, strides=[1, strides, strides, 1], padding='SAME')
-        x = tf.nn.bias_add(x, b)
-        return tf.nn.relu(x)
+        x = tf.nn.conv2d(x, W, strides=[1, strides, strides, 1],
+                padding='SAME', name="conv_Wx")
+        x = tf.nn.bias_add(x, b, name="conv_Wx_b")
+        return tf.nn.relu(x, name="conv_Wx_b_relu")
 
     def maxpool2d(self, x, k=2):
-        return tf.nn.max_pool(x, ksize=[1, k, k, 1], strides=[1, k, k, 1],padding='SAME')
+        return tf.nn.max_pool(x,
+                ksize=[1, k, k, 1],
+                strides=[1, k, k, 1],
+                padding='SAME',
+                name="mp")
 
-    def addConvLayer(self, width, height):
-        W = self.variable([2,2,1,32], "Wc")
-        b = self.variable([32], "bc")
-
-        conv = conv2d(self.x, W, b)
-        mp = maxpool2d(conv, k=2)
-
-        reshaped = ???
-
+    def addConvLayer(self):
         '''
         https://www.datacamp.com/community/tutorials/cnn-tensorflow-python
-
-        def weight_variable(shape):
-          initial = tf.truncated_normal(shape, stddev=0.1)
-          return tf.Variable(initial)
-
-        def bias_variable(shape):
-          initial = tf.constant(0.1, shape=shape)
-          return tf.Variable(initial)
-
-        def conv2d(x, W):
-          return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
-
-        def max_pool_2x2(x):
-          return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
-                                strides=[1, 2, 2, 1], padding='SAME')
-
-        W_conv1 = weight_variable([5, 5, 1, 32])
-        b_conv1 = bias_variable([32])
-
-        x = tf.placeholder(tf.float32, [None, 784])
-        x_image = tf.reshape(x, [-1,28,28,1])
-
-        h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
-        h_pool1 = max_pool_2x2(h_conv1)
-
-
-        W_conv2 = weight_variable([5, 5, 32, 64])
-        b_conv2 = bias_variable([64])
-
-        h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
-        h_pool2 = max_pool_2x2(h_conv2)
-
-
-        W_fc1 = weight_variable([7 * 7 * 64, 1024])
-        b_fc1 = bias_variable([1024])
-
-        h_pool2_flat = tf.reshape(h_pool2, [-1, 7*7*64])
-        h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
         '''
+        self.Wc = self.variable([2,2,1,32], "Wc")
+        self.bc = self.variable([32], "bc")
+
+        self.conv = self.conv2d(self.x, self.Wc, self.bc)
+        self.mp = self.maxpool2d(self.conv, k=2)
+
+        self.reshaped = tf.reshape(self.mp, [-1, 12], name="r")
+        self.input_size = 12
+
+        self.hiddenSizes.append(self.input_size)
+        self.hiddenParams.append((self.Wc, self.bc, self.mp, self.reshaped))
+
 
     def makeInputVector(self, state):
         return [state[0:6], state[7:13]]

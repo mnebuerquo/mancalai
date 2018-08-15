@@ -72,6 +72,7 @@ class NetworkBase():
         (layernum, lastSize, lastLayer) = self._lastLayer()
         wname = "W" + str(layernum)
         bname = "b" + str(layernum)
+        hname = "h" + str(layernum)
         logger.debug('hidden layer: {}, {}'.format(wname, bname))
         W = self.variable([lastSize, layer_size], wname)
         b = self.variable([layer_size], bname)
@@ -80,7 +81,7 @@ class NetworkBase():
         # x is prior layer output
         # W is weight
         # b is bias
-        h = tf.nn.relu(tf.matmul(lastLayer, W) + b, name="h" + str(layernum))
+        h = tf.nn.relu(tf.matmul(lastLayer, W) + b, name=hname)
         d = tf.nn.dropout(h, self.keep_prob)
         self.hiddenSizes.append(layer_size)
         self.hiddenParams.append((W, b, h, d))
