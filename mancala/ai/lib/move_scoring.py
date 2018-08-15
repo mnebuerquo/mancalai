@@ -33,7 +33,7 @@ def makeVector(state, m=None, isWinner=None, myscore=None, oppscore=None):
 
     >>> state = [1, 2, 3, 4, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 0]
     >>> makeVector(state, 0, 1)
-    [11, 1, 1, 2, 2, 2]
+    [101, 1, 1, 2, 2, 2]
 
     >>> state = [1, 2, 3, 0, 5, 6, 0, 12, 11, 7, 9, 8, 7, 0, 0]
     >>> makeVector(state, 2, 0)
