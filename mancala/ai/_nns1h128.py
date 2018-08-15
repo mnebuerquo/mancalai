@@ -1,6 +1,6 @@
 import random
 from .lib import AiBase
-from .lib.nn_lib import NetworkBase, trainingStream, INPUT_SIZE
+from .lib.nn_lib import NetworkBase, trainingStream
 import tensorflow as tf
 
 
@@ -13,7 +13,7 @@ class Network(NetworkBase):
             name="x")
 
     def makeInputVector(self, state):
-        return [state[0:6],state[7:13]]
+        return [state[0:6], state[7:13]]
 
     def __init__(self, name):
         super().__init__(name)
