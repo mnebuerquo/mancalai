@@ -84,7 +84,8 @@ class NetworkBase():
         d = tf.nn.dropout(h, self.keep_prob)
         self.hiddenSizes.append(layer_size)
         self.hiddenParams.append((W, b, h, d))
-"""
+
+    """
     def addConvLayer(self, shape, shape):
         wname = "Wc"
         bname = "bc"
@@ -133,7 +134,8 @@ class NetworkBase():
         h_pool2_flat = tf.reshape(h_pool2, [-1, 7*7*64])
         h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
         '''
-"""
+    """
+
     def initOutputLayer(self):
         (layernum, lastSize, lastLayer) = self._lastLayer()
         self.W_out = self.variable([lastSize, OUTPUT_SIZE], "W_out")
