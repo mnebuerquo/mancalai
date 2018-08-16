@@ -9,6 +9,7 @@
 1. Four pieces—marbles, chips, or stones—are placed in each of the 12 holes. The color of the pieces is irrelevant.
 1. Each player has a store (called a Mancala) to the right side of the Mancala board. (Cereal bowls work well for this purpose if you're using an egg carton.)
 
+<img src="https://images-na.ssl-images-amazon.com/images/I/81Y6ZP4rQWL._SL1500_.jpg" title="Photo of Mancala board" style="width:50%; height:auto; margin: 0 auto; text-align: center;"/>
 ---
 
 # Rules - Gameplay
@@ -92,7 +93,7 @@ It just picks a random move from the set of legal moves.
 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Depth-first-tree.svg/1200px-Depth-first-tree.svg.png" title="Depth-first search" style="width:70%; height:auto;"/>
 
 1. Start at the root of the tree (initial board state)
-2. If no children, evaluate the node and compute a score. Else evaluate each 
+2. If no children, evaluate the node and compute a score. Else evaluate each
    child as a new tree (recursively find score)
 3. After getting the scores of child nodes, choose best score to return as
    parent score.
@@ -123,7 +124,7 @@ Time complexity is explosive.
 
 --
 
-    - A/B pruning may skip a subtree, but if opponent makes an _unexpected_ move, 
+    - A/B pruning may skip a subtree, but if opponent makes an _unexpected_ move,
       then you may need that subtree after all. If it is not in your database
       or cache, you will need to evaluate it.
 
@@ -172,7 +173,7 @@ Recall we treated the board state as a Python list:
 ```
 
 * This is an input layer with 14 neurons (12 if we omit the mancalas where we
-  keep score). 
+  keep score).
 * Each neuron gets the integer count of beads in a bowl as its input.
 * We rotate the board in the data structure, so the player always appears to be
   player 1.
@@ -181,7 +182,7 @@ Recall we treated the board state as a Python list:
 
 # Output
 
-The output layer indicates which move to make. 
+The output layer indicates which move to make.
 
 * There can be up to 6 possible moves, each corresponding to one bowl.
 * The output layer emits 6 values between 0 and 1, each representing a move.
@@ -230,43 +231,70 @@ Shapes I have tried:
 1. Play games between two AI strategies in batches of N games each.
 2. After each batch, do additional training using the games just played.
 
-Both players learn from all the games. 
+Both players learn from all the games.
 
 Game play should improve as the players continue playing.
 
 ---
 
-# Learning from Repeated Training
+# Target values for training
 
-1. Scoring of moves by outcome of game
-	- Between 0 and 1
-	- Illegal moves to 0
-	- Move scored 1 if game was won
-	- Move scored 0 (other moves 1) if game was lost
+* Scoring of moves by outcome of each game
+	- Create a vector of values for each of six moves
+	- Each between 0 and 1
 
 --
 
-2. Alternate who moves first
+* Winning Player:
+	- Move value is 1 for moves chosen by player
+	- Move value is 0 for moves not chosen
 
 --
 
-3. Inject some randomness
-	- A NN is deterministic
-	- Needed variety of game states for training
+* Losing Player:
+	- Move value is 0 for moves chosen by player
+	- Move value is 1 for moves not chosen
+	- Illegal moves set to 0
+
+---
+
+# Lessons learned from training
+
+* There is a first move advantage
+	- Alternate who moves first
 
 --
 
-4. Input encoding
-	- array of bead counts
-	- one-hot encoding
+* Neural Networks are deterministic
+	- Random dropout to prevent overfitting
+	- We need more variety of game states for training
+	- Inject some randomness
+	- Playing games against luck AI does not add much value
+	- Many games have similar moves, so fewer epochs, more games
 
 --
 
-5. Back to scoring
-	- Bonus for captures
-	- Bonus for extra moves
-	- Still scoring moves higher for game outcome
-	- This basically trains a greedy algorithm into NN
+* Is our input vector the best way to represent the game?
+	- First attempt: array of bead counts
+	- Second attempt: one-hot encoding
+
+---
+
+# Revision to scoring:
+
+* Learning is slow if playing against greedy and random.
+	- Not enough variety in games against greedy
+	- Random is a weak player
+
+--
+
+* Change scoring to speed up training:
+	- Bonus for captures (number of beads)
+	- Bonus for getting an extra move (constant added)
+	- Constant added for moves by winning player
+	- Vector values normalized to range [0-1]
+
+Without winner bonus, this results in a greedy neural network
 
 ---
 
@@ -284,6 +312,18 @@ Game play should improve as the players continue playing.
 
 ---
 
+# What comes next?
+
+* Convolutional Neural Networks
+* Deeper Neural Networks
+* Faster training
+* Better training data
+* Randomly generated game states
+* Web API and Mobile App
+* Profit!
+
+---
+
 # References
 
 * [Mancala Board on Amazon](https://www.amazon.com/Square-Root-00015-Mancala/dp/B001V9HJ1W)
@@ -291,3 +331,4 @@ Game play should improve as the players continue playing.
 * [Alpha-Beta Pruning](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning)
 * [About Neural Networks](https://towardsdatascience.com/machine-learning-fundamentals-ii-neural-networks-f1e7b2cb3eef)
 * [Article about Mancala and AI](https://towardsdatascience.com/the-ancient-game-and-the-ai-d7704bea280d)
+* [Epochs vs. Batches](https://towardsdatascience.com/epoch-vs-iterations-vs-batch-size-4dfb9c7ce9c9)
