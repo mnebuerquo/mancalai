@@ -30,7 +30,7 @@ class Game():
         elif choice == 'm':
             algo = importlib.import_module('ai.abpwm')
         elif choice == 'n':
-            algo = importlib.import_module('ai.nn')
+            algo = importlib.import_module('ai.nn1h128')
         elif choice == 'h':
             algo = None
         else:
