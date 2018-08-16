@@ -3,7 +3,7 @@ import game_state as s
 SCORE_MOVE_AGAIN = 5
 SCORE_CAPTURE = 1
 SCORE_LOSER_MOVE = 1
-SCORE_WINNER_MOVE = 100
+SCORE_WINNER_MOVE = 20
 
 
 def legalVector(state, vector, illegalScore=0):
