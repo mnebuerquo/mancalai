@@ -7,13 +7,6 @@ import logging
 import sys
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-ch = logging.StreamHandler(sys.stderr)
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-logger.addHandler(ch)
 
 
 def timeIt():
@@ -66,6 +59,16 @@ def saveMoves(aiList, moves):
 
 def main():
     global batch_results
+
+    rootlogger = logging.getLogger()
+    rootlogger.setLevel(logging.INFO)
+    ch = logging.StreamHandler(sys.stderr)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    rootlogger.addHandler(ch)
+
     setupLogFile('training/random.jsonl')
     aiList = makeAIList()
     numPlayers = len(aiList)

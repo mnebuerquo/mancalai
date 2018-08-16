@@ -14,6 +14,7 @@ def setupLogFile(filename):
     fh = RotatingFileHandler(filename, maxBytes=10000000, backupCount=100)
     fh.setLevel(logging.DEBUG)
     results.addHandler(fh)
+    results.propagate = False
     return results
 
 
@@ -25,6 +26,7 @@ def needRandomMove(numMoves):
 
 
 def play_one_game(players, lucky):
+    global results
     game = s.init()
     done = False
     moves = []
