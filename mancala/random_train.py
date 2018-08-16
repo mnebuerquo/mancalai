@@ -43,7 +43,7 @@ def saveMoves(aiList, moves):
     global batch_results
     numPlayers = len(aiList)
     msg = "Played {} moves in {} games in {} seconds."
-    max_moves = 20000
+    max_moves = 9900
     max_games = 500
     training_moves += moves
     numMoves = len(training_moves)
