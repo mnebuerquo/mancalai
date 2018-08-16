@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 INPUT_SIZE = (s.NUM_PLAYERS * 7)
 OUTPUT_SIZE = 6
 
-LEARNING_RATE = 0.01
-BATCH_SIZE = 1000
+LEARNING_RATE = 0.001
+BATCH_SIZE = 5000
 EPOCHS = 50
 SAVE_PATH = "./data/"
 DROPOUT_PROBABILITY = 0.10
@@ -53,8 +53,7 @@ class NetworkBase():
         # placeholders for inputs and outputs
         self.initInputPlaceholder()
         self.y_ = tf.placeholder(
-            tf.float32, shape=[
-                None, OUTPUT_SIZE], name="y_")
+            tf.float32, shape=[None, OUTPUT_SIZE], name="y_")
         self.keep_prob = tf.placeholder(tf.float32, name="keep_prob")
 
     def _lastLayer(self):
@@ -74,7 +73,7 @@ class NetworkBase():
         bname = "b" + str(layernum)
         hname = "h" + str(layernum)
         logger.debug('hidden layer: {}, {}'.format(wname, bname))
-        W = self.variable([lastSize, layer_size], wname)
+        W = self.variable([int(lastLayer.shape[-1]), layer_size], wname)
         b = self.variable([layer_size], bname)
         # layer fulfills equation: h = a(Wx + b)
         # a is activation function (relu)
@@ -88,7 +87,7 @@ class NetworkBase():
 
     def initOutputLayer(self):
         (layernum, lastSize, lastLayer) = self._lastLayer()
-        self.W_out = self.variable([lastSize, OUTPUT_SIZE], "W_out")
+        self.W_out = self.variable([int(lastLayer.shape[-1]), OUTPUT_SIZE], "W_out")
         self.b_out = self.variable([OUTPUT_SIZE], "b_out")
         self.y = tf.nn.softmax(tf.matmul(lastLayer, self.W_out) +
                                self.b_out, name="y")
@@ -144,8 +143,7 @@ class NetworkBase():
             self.y_: dfy_,
             self.keep_prob: 1 - self.dropout_prob
         }
-        self.train_step.run(
-            session=self.sess, feed_dict=fd)
+        self.train_step.run(session=self.sess, feed_dict=fd)
         os.makedirs(self.save_path, exist_ok=True)
         self.saver.save(self.sess, self.save_name)
         end = timer()

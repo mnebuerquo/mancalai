@@ -1,4 +1,5 @@
 from ai_list import makeAIList
+from ai import luck
 from random import randrange
 from trainlib import setupLogFile, play_one_game
 from time import process_time
@@ -42,7 +43,7 @@ def saveMoves(aiList, moves):
     global batch_results
     numPlayers = len(aiList)
     msg = "Played {} moves in {} games in {} seconds."
-    max_moves = 10000
+    max_moves = 20000
     max_games = 500
     training_moves += moves
     numMoves = len(training_moves)
@@ -64,14 +65,13 @@ def saveMoves(aiList, moves):
         games_delta = next(games_start)
 
 
-def main():
+def main(args):
     global batch_results
     setupLogFile('training/random.jsonl')
-    aiList = makeAIList()
+    aiList = makeAIList(args)
     numPlayers = len(aiList)
     resultList = resultsInit(numPlayers)
     batch_results = resultsInit(numPlayers)
-    luck = [x for x in aiList if x['name'] == 'luck'][0]['module']
     lucky = luck.AI()
     try:
         while True:
@@ -90,4 +90,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])

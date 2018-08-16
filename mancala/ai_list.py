@@ -5,14 +5,17 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def makeAIList():
+def makeAIList(defaultList=None):
     aiList = []
-    # list files in dir
-    path = './mancala/ai/'
-    files = glob.glob(path + '*.py')
-    pattern = r'.*/([^_/]+\w*)\.py'
-    matches = [re.match(pattern, x) for x in files]
-    groups = [m.group(1) for m in matches if m is not None]
+    if defaultList:
+        groups = defaultList
+    else:
+        # list files in dir
+        path = './mancala/ai/'
+        files = glob.glob(path + '*.py')
+        pattern = r'.*/([^_/]+\w*)\.py'
+        matches = [re.match(pattern, x) for x in files]
+        groups = [m.group(1) for m in matches if m is not None]
     for f in groups:
         logger.info("loading {}".format(f))
         res = {}

@@ -29,8 +29,9 @@ class Network(NetworkBase):
         '''
         https://www.datacamp.com/community/tutorials/cnn-tensorflow-python
         '''
-        self.Wc = self.variable([2,2,1,32], "Wc")
-        self.bc = self.variable([32], "bc")
+        depth = 4
+        self.Wc = self.variable([2,2,1,depth], "Wc")
+        self.bc = self.variable([depth], "bc")
 
         self.conv = self.conv2d(self.x, self.Wc, self.bc)
         self.mp = self.maxpool2d(self.conv, k=2)
@@ -66,9 +67,7 @@ class AI(AiBase):
 
     def taunt(self):
         taunts = [
-            'I look at the board in a different way.',
-            "I'll win this one for sure.",
-            "You're not as good looking as I am.",
+            "Feeling convoluted?",
         ]
         return random.choice(taunts)
 
