@@ -284,6 +284,16 @@ Game play should improve as the players continue playing.
 
 ---
 
+# Next Steps
+
+* Convolutional Neural Networks
+* Deeper networks
+* Training values based on game score
+* API and Mobile App
+* Profit!
+
+---
+
 # References
 
 * [Mancala Board on Amazon](https://www.amazon.com/Square-Root-00015-Mancala/dp/B001V9HJ1W)
