@@ -28,7 +28,7 @@
 
 # Where to start?
 
-Represent both the state of the game and the rules in Python.
+How do we teach a machine to play a board game?
 
 ```
 +-----+-----+-----+-----+-----+-----+-----+-----+
@@ -42,6 +42,9 @@ Represent both the state of the game and the rules in Python.
 +-----+-----+-----+-----+-----+-----+-----+-----+
          A     B     C     D     E     F
 ```
+
+First represent both the state of the game and the rules in code.
+
 In Python this is just a list:
 
 ```python
