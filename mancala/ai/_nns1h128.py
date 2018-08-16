@@ -43,7 +43,10 @@ class Network(NetworkBase):
 
 
     def makeInputVector(self, state):
-        return [state[0:6], state[7:13]]
+        return [
+                [[x] for x in state[0:6]],
+                [[x] for x in state[7:13]]
+                ]
 
     def __init__(self, name):
         super().__init__(name)
