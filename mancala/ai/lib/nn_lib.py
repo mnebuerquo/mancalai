@@ -5,6 +5,7 @@ import json
 from timeit import default_timer as timer
 from .move_scoring import moveToVector
 import logging
+import random
 
 logger = logging.getLogger(__name__)
 
@@ -176,6 +177,37 @@ class NetworkBase():
             head = []
         print("Trained {} moves.".format(rows))
 
+    def chooseMoveRandomly(self, scores, legalMoves):
+        '''
+        Randomly choose legal move using scores as weights for the probability of
+        choosing that move.
+        '''
+        ladder = [(x, i) for i, x in enumerate(scores) if i in legalMoves]
+        total = sum([x for x, i in ladder])
+        pick = random.uniform(0, total)
+        accum = 0
+        for x, i in ladder:
+            accum += x
+            if accum >= pick:
+                return i
+        logger.debug(self.name + " failed to pick a move. Returning random legal move.")
+        return random.choice(legalMoves)
+
+
+    def chooseMoveDeterministic(self, scores, legalMoves):
+        '''
+        Picks highest scored move no matter what. NN always makes same move given same input.
+        '''
+        bestmove = -1
+        bestscore = -1
+        for m in legalMoves:
+            if bestscore < scores[m]:
+                bestmove = m
+                bestscore = scores[m]
+        if bestmove < 0:
+            bestmove = legalMoves[0]
+        return bestmove
+
     def getMove(self, state):
         # rotate the board for current player
         player = s.getCurrentPlayer(state)
@@ -191,18 +223,10 @@ class NetworkBase():
         # y is a list containing a single output vector
         # y == [[0.0108906 0.1377293 0.370027 0.2287382 0.0950692 0.1575449]]
         scores = list(y[0])
-        bestmove = -1
-        bestscore = -1
         # we only want to pick from legal moves (the nn will learn these
         # eventually, but we're helping him with this constraint)
         legalMoves = s.getLegalMoves(board)
-        for m in legalMoves:
-            if bestscore < scores[m]:
-                bestmove = m
-                bestscore = scores[m]
-        if bestmove < 0:
-            bestmove = legalMoves[0]
-        move = bestmove
+        move = self.chooseMoveRandomly(scores, legalMoves)
         # if we rotated the board before, rotate it back
         if flip:
             move = s.flipMove(move, player)
