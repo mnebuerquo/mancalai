@@ -64,3 +64,104 @@ against the Minimax solution, then use the trained networks as trainers for
 new networks and to improve themselves.
 
 Most of this repo is about training neural networks to play.
+
+These are the neural networks I have put together so far:
+
+* greedy - Not a neural network, a deterministic algorithm
+* luck - Not a neural network, just randomly choose a move
+* nn1h128 - One hidden layer, 128 neurons
+* nn2h80 - Two hidden layers, 80 neurons each
+* nn3h80 - Three hidden layers, 80 neurons each
+* nns1h128 - Input only includes the 12 cups, no mancalas
+* nnx1h128 - One-hot encoding inputs
+* nnx3h80 - One-hot encoding inputs
+* cnns1h128 - a very simple convolutional neural network
+
+# Project Structure
+
+All of the game rules and AI modules are in the [mancala](./mancala) directory.
+The game rules with tests are in [game_state.py](./mancala/game_state.py).
+AI modules are in the [mancala/ai](./mancala/ai) directory, and look for the
+base class for my neural networks in [nn_lib](./mancala/ai/lib/nn_lib.py).
+
+Tools for running in Docker containers are in [deploy](./deploy).
+There is a very simple HTTP API in [webapi](./webapi).
+
+## Build the Docker container
+
+These instructions all run the programs in docker containers. First you must
+build a container to run in.
+
+All of these commands start in the top level directory of this repo.
+
+```bash
+./deploy/build.sh dev
+```
+
+## How to run the programs
+
+### CI
+
+I use autopep8, flake8, and doctest to keep my code neat and tested.
+
+```bash
+./deploy/dev.sh --ci /dev/null
+```
+
+### Random Training
+To simply start training all the neural networks at once, use the random_train
+module:
+
+```bash
+./deploy/dev.sh mancala/random_train.py
+```
+
+This will randomly match neural networks against each other, or against luck or
+greedy algorithms. After each game, the moves will be saved, and after a batch
+of games the training will begin. This will run forever or until you stop it
+(ctrl+c), training all neural networks from the moves recorded in all of the
+games played.
+
+You may also specify a list of AI players on the comnand line to limit the
+matches to just those players.
+
+### Adversarial
+
+Sometimes you want two neural networks to practice against each other. This
+allows them both to improve their skills by playing batches of games against
+each other. As one improves, the other should improve also.
+
+To start this kind of training you must specify which networks are to train:
+```bash
+./deploy/dev.sh mancala/adversary.py nn1h128 cnns1h128
+```
+
+### Play Human vs. Machine
+
+When you want to play against any of the AI players, specify which ai you want
+on the command line:
+
+```bash
+./deploy/dev.sh mancala/play.py nn1h128
+```
+
+### Tournament Mode
+
+To play each AI against the others and get a table of their win rates:
+```bash
+./deploy/dev.sh mancala/tournament.py 3
+```
+
+The `3` is the number of matches between each pair of AI players.
+
+### Training from Files
+
+To train an AI player from a set of saved game moves, you must specify the name
+of the AI on the command line:
+
+```bash
+./deploy/dev.sh mancala/train.py nn1h128
+```
+
+This will train that AI using moves saved in JSONL files in the
+[training](./training) directory.

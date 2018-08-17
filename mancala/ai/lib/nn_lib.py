@@ -87,7 +87,8 @@ class NetworkBase():
 
     def initOutputLayer(self):
         (layernum, lastSize, lastLayer) = self._lastLayer()
-        self.W_out = self.variable([int(lastLayer.shape[-1]), OUTPUT_SIZE], "W_out")
+        self.W_out = self.variable(
+            [int(lastLayer.shape[-1]), OUTPUT_SIZE], "W_out")
         self.b_out = self.variable([OUTPUT_SIZE], "b_out")
         self.y = tf.nn.softmax(tf.matmul(lastLayer, self.W_out) +
                                self.b_out, name="y")

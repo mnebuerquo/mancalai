@@ -3,6 +3,7 @@ from .lib import AiBase
 from .lib.nn_lib import NetworkBase, trainingStream
 import tensorflow as tf
 
+
 class Network(NetworkBase):
 
     def initInputPlaceholder(self):
@@ -14,23 +15,23 @@ class Network(NetworkBase):
     def conv2d(self, x, W, b, strides=1):
         # Conv2D wrapper, with bias and relu activation
         x = tf.nn.conv2d(x, W, strides=[1, strides, strides, 1],
-                padding='SAME', name="conv_Wx")
+                         padding='SAME', name="conv_Wx")
         x = tf.nn.bias_add(x, b, name="conv_Wx_b")
         return tf.nn.relu(x, name="conv_Wx_b_relu")
 
     def maxpool2d(self, x, k=2):
         return tf.nn.max_pool(x,
-                ksize=[1, k, k, 1],
-                strides=[1, k, k, 1],
-                padding='SAME',
-                name="mp")
+                              ksize=[1, k, k, 1],
+                              strides=[1, k, k, 1],
+                              padding='SAME',
+                              name="mp")
 
     def addConvLayer(self):
         '''
         https://www.datacamp.com/community/tutorials/cnn-tensorflow-python
         '''
         depth = 4
-        self.Wc = self.variable([2,2,1,depth], "Wc")
+        self.Wc = self.variable([2, 2, 1, depth], "Wc")
         self.bc = self.variable([depth], "bc")
 
         self.conv = self.conv2d(self.x, self.Wc, self.bc)
@@ -42,12 +43,11 @@ class Network(NetworkBase):
         self.hiddenSizes.append(self.input_size)
         self.hiddenParams.append((self.Wc, self.bc, self.mp, self.reshaped))
 
-
     def makeInputVector(self, state):
         return [
-                [[x] for x in state[0:6]],
-                [[x] for x in state[7:13]]
-                ]
+            [[x] for x in state[0:6]],
+            [[x] for x in state[7:13]]
+        ]
 
     def __init__(self, name):
         super().__init__(name)
