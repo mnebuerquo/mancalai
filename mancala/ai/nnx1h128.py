@@ -1,6 +1,6 @@
 import random
-from .lib import AiBase
-from .lib.nn_lib import NetworkBase, trainingStream, INPUT_SIZE
+from .lib import AiNNBase
+from .lib.nn_lib import NetworkBase, INPUT_SIZE
 import tensorflow as tf
 MAX_BEADS = 48
 
@@ -51,7 +51,7 @@ class Network(NetworkBase):
             self.initSession()
 
 
-class AI(AiBase):
+class AI(AiNNBase):
     def __init__(self):
         super().__init__()
         self.nn = Network(__name__)
@@ -63,13 +63,3 @@ class AI(AiBase):
             "You're not as good looking as I am.",
         ]
         return random.choice(taunts)
-
-    def train(self, data=None, datafile=None):
-        if data:
-            self.nn.train(data)
-        if datafile is not None:
-            with open(datafile, "r") as infile:
-                self.nn.train(trainingStream(infile))
-
-    def move(self, state):
-        return self.nn.getMove(state)

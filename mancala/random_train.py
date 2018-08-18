@@ -16,6 +16,11 @@ formatter = logging.Formatter(
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
+NUM_BATCHES = 2
+BATCH_SIZE = 10000
+MAX_MOVES = NUM_BATCHES * BATCH_SIZE * 0.996
+MAX_GAMES = MAX_MOVES / 20
+
 
 def timeIt():
     startTime = process_time()
@@ -43,8 +48,8 @@ def saveMoves(aiList, moves):
     global batch_results
     numPlayers = len(aiList)
     msg = "Played {} moves in {} games in {} seconds."
-    max_moves = 19950
-    max_games = 1000
+    max_moves = MAX_MOVES
+    max_games = MAX_GAMES
     training_moves += moves
     numMoves = len(training_moves)
     training_games += 1
@@ -55,7 +60,7 @@ def saveMoves(aiList, moves):
         logger.info(msg.format(numMoves, training_games, sec))
         next(training_timer)
         for p in aiList:
-            p['ai'].train(data=training_moves)
+            p['ai'].train(data=training_moves, batch_size=BATCH_SIZE)
         train_delta = next(training_timer)
         sec = int(train_delta * 1000) / 1000
         logger.debug("Training done in {} sec".format(sec))

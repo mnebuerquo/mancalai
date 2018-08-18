@@ -2,6 +2,7 @@ import game_state as s
 import tensorflow as tf
 import os
 import json
+import math
 from timeit import default_timer as timer
 from .move_scoring import moveToVector
 import logging
@@ -13,7 +14,7 @@ INPUT_SIZE = (s.NUM_PLAYERS * 7)
 OUTPUT_SIZE = 6
 
 LEARNING_RATE = 0.001
-BATCH_SIZE = 10000
+BATCH_SIZE = 20000
 EPOCHS = 1
 SAVE_PATH = "./data/"
 DROPOUT_PROBABILITY = 0.10
@@ -162,12 +163,14 @@ class NetworkBase():
                 int(rate * 1000) / 1000
             ))
 
-    def train(self, datastream):
+    def train(self, datastream, batch_size=None):
+        if not batch_size:
+            batch_size = self.batch_size
         rows = 0
         head = []
         for row in datastream:
             head.append(row)
-            if len(head) >= self.batch_size:
+            if len(head) >= batch_size:
                 self.train_batch(head)
                 rows += len(head)
                 head = []
@@ -179,8 +182,8 @@ class NetworkBase():
 
     def chooseMoveRandomly(self, scores, legalMoves):
         '''
-        Randomly choose legal move using scores as weights for the probability of
-        choosing that move.
+        Randomly choose legal move using scores as weights for the probability
+        of choosing that move.
         '''
         ladder = [(x, i) for i, x in enumerate(scores) if i in legalMoves]
         total = sum([x for x, i in ladder])
@@ -190,13 +193,15 @@ class NetworkBase():
             accum += x
             if accum >= pick:
                 return i
-        logger.debug(self.name + " failed to pick a move. Returning random legal move.")
+        logger.debug(
+            self.name +
+            " failed to pick a move. Returning random legal move.")
         return random.choice(legalMoves)
-
 
     def chooseMoveDeterministic(self, scores, legalMoves):
         '''
-        Picks highest scored move no matter what. NN always makes same move given same input.
+        Picks highest scored move no matter what. NN always makes same move
+        given same input.
         '''
         bestmove = -1
         bestscore = -1
@@ -227,6 +232,8 @@ class NetworkBase():
         # eventually, but we're helping him with this constraint)
         legalMoves = s.getLegalMoves(board)
         move = self.chooseMoveRandomly(scores, legalMoves)
+        if len([x for x in scores if math.isnan(x)]) > 0:
+            logger.error(self.name + " returned NaN!")
         # if we rotated the board before, rotate it back
         if flip:
             move = s.flipMove(move, player)
