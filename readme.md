@@ -87,6 +87,8 @@ base class for my neural networks in [nn_lib](./mancala/ai/lib/nn_lib.py).
 Tools for running in Docker containers are in [deploy](./deploy).
 There is a very simple HTTP API in [webapi](./webapi).
 
+(See [dockerized](./dockerized.md) for more.)
+
 ## Build the Docker container
 
 These instructions all run the programs in docker containers. First you must
@@ -96,6 +98,13 @@ All of these commands start in the top level directory of this repo.
 
 ```bash
 ./deploy/build.sh dev
+```
+
+To build the container for running the API, use `api` as the argument to the
+build command (see [dockerized](./dockerized.md) for more):
+
+```bash
+./deploy/build.sh api
 ```
 
 ## How to run the programs
@@ -165,3 +174,12 @@ of the AI on the command line:
 
 This will train that AI using moves saved in JSONL files in the
 [training](./training) directory.
+
+### API
+
+There is a minimal API for playing a game. This is still a work in progress.
+See [dockerized](./dockerized.md) documentation for more.
+
+```bash
+./deploy/dev.sh --api
+```
