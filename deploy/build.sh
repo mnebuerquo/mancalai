@@ -1,8 +1,10 @@
-#!/bin/sh
+!/bin/sh
 
-DOCKERFILE="Dockerfile.${1:-api}"
+WHICH="${1:-api}"
+DOCKERFILE="Dockerfile.${WHICH}"
+NAME="mancalai-${WHICH}"
 echo "Building from $DOCKERFILE"
 docker build \
-	-t mancalai \
+	-t "${NAME}" \
 	-f "${DOCKERFILE}" \
 	./
