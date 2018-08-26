@@ -2,12 +2,13 @@ from flask import Flask, request
 from mancala import game_state
 from flask_json import FlaskJSON, as_json, JsonError, jsonify
 from mancala.aimove import aiMove
+from mancala.game_state import isGameOver, scoreGame, getScore, getWinner
 
 app = Flask(__name__)
 FlaskJSON(app)
 
 
-def decodeState(state):
+def fixInputData(state):
     return [int(x) for x in state]
 
 
@@ -20,6 +21,16 @@ def errorMessage(code, message):
     resp = jsonify(message)
     resp.status_code = code
     return resp
+
+
+def checkWin(response):
+    gamestate = response['gamestate']
+    gamestate = scoreGame(gamestate)
+    if isGameOver(gamestate):
+        response['gameOver'] = True
+        response['winner'] = getWinner(gamestate)
+        response['score'] = getScore(gamestate)
+    return response
 
 
 @app.errorhandler(404)
@@ -50,11 +61,12 @@ def move():
     """
     data = request.get_json(force=True)
     try:
-        state = decodeState(data['gamestate'])
+        state = fixInputData(data['gamestate'])
         move = int(data['move'])
     except (KeyError, TypeError, ValueError):
         raise JsonError(description='Invalid value.')
-    return {"gamestate": game_state.doMove(state, move)}
+    resp = {"gamestate": game_state.doMove(state, move)}
+    return checkWin(resp)
 
 
 @app.route("/aimove", methods=['POST'])
@@ -70,17 +82,18 @@ def aimove():
     """
     data = request.get_json(force=True)
     try:
-        state = decodeState(data['gamestate'])
+        state = fixInputData(data['gamestate'])
         ai = str(data['ai-name'])
     except (KeyError, TypeError, ValueError):
         raise JsonError(description='Invalid value.')
     move = aiMove(ai, state)
-    return {
+    resp = {
         "pre-state": state,
         "ai-name": ai,
         "move": move,
         "gamestate": game_state.doMove(state, move)
     }
+    return checkWin(resp)
 
 
 @app.route("/new")
