@@ -26,7 +26,8 @@ def errorMessage(code, message):
 def checkWin(response):
     gamestate = response['gamestate']
     gamestate = scoreGame(gamestate)
-    if isGameOver(gamestate):
+    response['gameOver'] = isGameOver(gamestate)
+    if response['gameOver']:
         response['gameOver'] = True
         response['winner'] = getWinner(gamestate)
         response['score'] = getScore(gamestate)
@@ -102,7 +103,7 @@ def new():
     """
     Create a new game, return its state.
     """
-    return {"gamestate": game_state.init()}
+    return checkWin({"gamestate": game_state.init()})
 
 
 def main():
