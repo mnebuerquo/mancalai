@@ -183,3 +183,10 @@ See [dockerized](./dockerized.md) documentation for more.
 ```bash
 ./deploy/dev.sh --api
 ```
+
+## Links
+
+* [Rules of the game](https://www.thespruce.com/how-to-play-mancala-409424)
+* [Discussion of rules](https://boardgamegeek.com/thread/679276/capture)
+* [More discussion of capture (rule 8)](https://boardgamegeek.com/article/3058108#3058108)
+* [Kalah, on Atlas, 1968](http://www.chilton-computing.org.uk/acl/literature/reports/p003.htm)
