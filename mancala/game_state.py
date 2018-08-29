@@ -460,12 +460,20 @@ def doMove(state, move):
     """
     This applies a move and returns the new game state.
 
+    Standard move
     >>> doMove([1, 2, 3, 4, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 0], 4)
     [1, 2, 3, 4, 0, 7, 1, 13, 12, 11, 9, 8, 7, 0, 1]
 
+    Move capturing opposite side pieces
     >>> doMove([1, 0, 3, 4, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 0], 0)
     [0, 0, 3, 4, 5, 6, 9, 12, 11, 10, 9, 0, 7, 0, 1]
 
+    Move not capturing opposite side pieces, but landing in empty space
+    https://boardgamegeek.com/article/3058108#3058108
+    >>> doMove([1, 0, 3, 4, 5, 6, 0, 12, 11, 10, 9, 0, 7, 0, 0], 0)
+    [0, 1, 3, 4, 5, 6, 0, 12, 11, 10, 9, 0, 7, 0, 1]
+
+    move resulting in free move
     >>> doMove([1, 2, 4, 4, 5, 6, 0, 12, 11, 10, 9, 8, 7, 0, 0], 2)
     [1, 2, 0, 5, 6, 7, 1, 12, 11, 10, 9, 8, 7, 0, 0]
     """
@@ -492,11 +500,12 @@ def doMove(state, move):
         newstate[nextBowl] += 1  # drop a stone
     if wasEmpty:
         opposite = getOppositeBowl(nextBowl)
-        # capture moving piece and opposite bowl count
-        captured = newstate[opposite] + 1
-        newstate[opposite] = 0  # captured opposite
-        newstate[nextBowl] = 0  # captured moving piece
-        newstate[getMancalaIndex(player)] += captured
+        if newstate[opposite] > 0:
+            # capture moving piece and opposite bowl count
+            captured = newstate[opposite] + 1
+            newstate[opposite] = 0  # captured opposite
+            newstate[nextBowl] = 0  # captured moving piece
+            newstate[getMancalaIndex(player)] += captured
     if not freeTurn:
         newstate[PLAYER_TURN] = nextPlayer(player)
     return scoreGame(newstate)
