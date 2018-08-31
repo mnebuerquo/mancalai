@@ -19,6 +19,7 @@ results.setLevel(logging.INFO)
 
 def matchups(num_players, num_epochs):
     for e in range(num_epochs):
+        print("epoch {}".format(e))
         for i in range(num_players):
             for j in range(num_players):
                 yield (i, j, e)
@@ -35,9 +36,11 @@ def play_game(*players):
     return s.getWinner(game)
 
 
-def main(numEpochs="3"):
+def main(numEpochs="3", *exclude):
     numEpochs = int(numEpochs)
     aiList = makeAIList()
+    aiList = [ x for x in aiList if x['name'] not in  exclude ]
+    aiList = sorted(aiList, key=lambda x: x['name'])
     numPlayers = len(aiList)
     resultList = [[[0, 0, 0] for n in range(numPlayers)]
                   for m in range(numPlayers)]
