@@ -2,4 +2,4 @@
 
 docker run \
 	-p 5000 \
-	mancalai "$@"
+	mancalai
