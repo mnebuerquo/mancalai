@@ -1,8 +1,7 @@
 #!/bin/sh
 
-WHICH="${1:-api}"
-IMAGE="mancalai-${WHICH}"
+IMAGE="mancalai-api"
 
 docker run \
 	-p 5000 \
-	${IMAGE} "$@"
+	${IMAGE}
